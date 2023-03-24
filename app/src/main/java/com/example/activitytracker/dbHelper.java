@@ -11,19 +11,22 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 public class dbHelper extends SQLiteOpenHelper {
+    //public dbHelper(Context context) {super(context, "LocationDataDB", null, 1);}
     public dbHelper(Context context) {
-        super(context, "LocationDataDB", null, 1);
+        super(context, "testDB", null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create Table LocationDetails(activity_id INTEGER PRIMARY KEY AUTOINCREMENT, latitude DOUBLE, longitude DOUBLE, timestamp STRING)");
+        //LocationDetails
+        db.execSQL("create Table test(activity_id INTEGER PRIMARY KEY AUTOINCREMENT, latitude DOUBLE, longitude DOUBLE, timestamp STRING)");
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("drop Table if exists LocationDetails");
+        //LocationDetails
+        db.execSQL("drop Table if exists tests");
     }
 
 
@@ -36,7 +39,8 @@ public class dbHelper extends SQLiteOpenHelper {
         content.put("timestamp",timestamp);
         Log.d("dbhelper",content.toString());
 
-        long result = db.insert("LocationDetails",null, content);
+        //LocationDetails
+        long result = db.insert("test",null, content);
         if(result == -1){
             return false;
         }else{
@@ -68,7 +72,8 @@ public class dbHelper extends SQLiteOpenHelper {
 
     public Cursor getData(){
         SQLiteDatabase db = this.getWritableDatabase();
-        Cursor cursor = db.rawQuery("Select * from LocationDetails", null);
+        //LocationDetails
+        Cursor cursor = db.rawQuery("Select * from test", null);
         cursor.moveToFirst();
         return cursor;
     }
