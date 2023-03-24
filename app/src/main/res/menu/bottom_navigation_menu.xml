@@ -1,0 +1,17 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/home_nav"
+        android:title="Home"
+        android:icon="@drawable/home_button" />
+    <item android:id="@+id/location_nav"
+        android:title="Location"
+        android:icon="@drawable/map_button" />
+    <item android:id="@+id/screen_activity_nav"
+        android:title="Screentime"
+        android:icon="@drawable/screentime_button" />
+    <item android:id="@+id/evaluation_nav"
+        android:title="Evaluate"
+        android:icon="@drawable/evaluation_button" />
+    <item android:id="@+id/export_nav"
+        android:title="Export"
+        android:icon="@drawable/data_export_button" />
+</menu>
