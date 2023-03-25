@@ -45,6 +45,7 @@ public class MainActivity extends AppCompatActivity {
         fm.beginTransaction().add(R.id.rootLayout,fragment1, "1").commit();
 
 
+
     }
 
     private BottomNavigationView.OnItemSelectedListener mOnNavigationItemSelectedListener

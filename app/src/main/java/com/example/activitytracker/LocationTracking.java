@@ -144,7 +144,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         if (permissionGranted) {
             if (checkGoogleServices()) {
                 //getLocation();
-                mapView.getMapAsync(this);
+                mapView.getMapAsync(LocationTracking.this);
                 mapView.onCreate(savedInstanceState);
                 if (permissionGranted){
                     checkGPS();
@@ -449,14 +449,12 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                     }
                 }*/
                 for (int i = 0; i < latitudeArray.length; i++) {
-                    //options.add(new LatLng(Double.parseDouble(latitudeArray[i]),(Double.parseDouble(longitudeArray[i]))));
                     options.add(new LatLng(Double.parseDouble(latitudeArray[i]),(Double.parseDouble(longitudeArray[i]))));
                     //Log.d("arrayTest","Latitude " + i + ": " + latitudeArray[i] + "\n");
                     //Log.d("arrayTest","Longitude " + i + ": " + longitudeArray[i] + "\n");
                     //Log.d("arrayTest","Timestamp " + i + ": " + timestampsArray[i] + "\n");
                 }
-                //options.add(new LatLng(49.0204217, 12.1022117));
-                //options.add(new LatLng(49.0204217, 12.1322117));
+
                 googleMap.addPolyline(options);
 
                 Log.d("insertDB",checkInsert.toString());

@@ -7,11 +7,11 @@
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/tv_steps_overview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="this is the homescreen"/>
+        android:text="Übersicht deiner Schritte in dieser Woche"/>
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/step_chart"
@@ -19,6 +19,14 @@
         android:layout_height="200dp"
         android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/tv_location_overview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_marginTop="250dp"
+        android:text="Übersicht deiner Standorte heute"/>
 
     <ListView
         android:id="@+id/location_list"
