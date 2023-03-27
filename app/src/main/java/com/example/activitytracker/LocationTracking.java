@@ -32,8 +32,10 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -245,7 +247,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
 
 
 
-    //switscher von steps zu km
+    //switcher von steps zu km
     private float counterToKM(int steps) {
         float stepsKM = (float) steps / 1400;
         return (float) (Math.round(stepsKM * 100) / 100.);
@@ -344,23 +346,6 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         return false;
     }
 
-    private void getLocation() {
-        if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            return;
-        }
-        Task<Location> locTask = locationProviderClient.getLastLocation();
-        locTask.addOnSuccessListener(new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if(location != null){
-                    currentLocation = location;
-                    mapView.getMapAsync(LocationTracking.this);
-                }
-            }
-        });
-
-    }
-
 
     //checkt ob gps am smartphone aktiviert ist
     private void checkGPS() {
@@ -404,7 +389,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     }
 
 
-    //getcurrentLocation
+    //getcurrentLocation --> update db
     private void getCurrentLocationUpdate() {
         locationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -468,6 +453,22 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                     Toast.makeText(getActivity().getApplicationContext(), "no Location inserted in DB", Toast.LENGTH_SHORT).show();
                 }
                 //Toast.makeText(getActivity().getApplicationContext(), "Location:"+locationResult.getLastLocation().getLongitude()+": "+locationResult.getLastLocation().getLatitude(), Toast.LENGTH_SHORT).show();
+
+
+                ListView locationList = HomeScreen.locationList;
+                ArrayList<String> addresses = HomeScreen.addresses;
+                ArrayAdapter<String> listViewAdapter = HomeScreen.listViewAdapter;
+
+                try {
+                    addresses.add(getAddressFromLatLong(currentLocation.getLatitude(), currentLocation.getLongitude()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                listViewAdapter.notifyDataSetChanged();
+                locationList.invalidateViews();
+                locationList.refreshDrawableState();
+
+
             }
         }, Looper.getMainLooper());
     }
