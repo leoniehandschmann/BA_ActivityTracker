@@ -24,12 +24,15 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.logging.Logger;
 
 public class HomeScreen extends Fragment {
 
     public static ListView locationList;
     public static ArrayList<String> addresses;
+    public static ArrayList<String> addressesList;
     public static ArrayAdapter <String> listViewAdapter;
 
     ArrayList <BarEntry> barDataList;
@@ -45,7 +48,7 @@ public class HomeScreen extends Fragment {
         dbHelper db = new dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
         addresses = new ArrayList<String>();
-        listViewAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addresses);
+        addressesList = new ArrayList<String>();
 
 
         /*while(c.moveToNext()){
@@ -68,6 +71,15 @@ public class HomeScreen extends Fragment {
                 }
             } while (c.moveToNext());
         }
+
+        Set<String> set = new HashSet<>();
+        for (String s : addresses) {
+            if (set.add(s)) {
+                addressesList.add(s);
+            }
+        }
+
+        listViewAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesList);
 
 
         locationList.setAdapter(listViewAdapter);
@@ -117,6 +129,8 @@ public class HomeScreen extends Fragment {
         barDataList.add(new BarEntry(6.6f,70));
         return barDataList;
     }
+
+
 
 
 

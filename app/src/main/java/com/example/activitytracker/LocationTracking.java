@@ -455,18 +455,20 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 //Toast.makeText(getActivity().getApplicationContext(), "Location:"+locationResult.getLastLocation().getLongitude()+": "+locationResult.getLastLocation().getLatitude(), Toast.LENGTH_SHORT).show();
 
 
-                ListView locationList = HomeScreen.locationList;
-                ArrayList<String> addresses = HomeScreen.addresses;
-                ArrayAdapter<String> listViewAdapter = HomeScreen.listViewAdapter;
-
                 try {
-                    addresses.add(getAddressFromLatLong(currentLocation.getLatitude(), currentLocation.getLongitude()));
+                    if(!HomeScreen.addressesList.contains(getAddressFromLatLong(currentLocation.getLatitude(), currentLocation.getLongitude()))) {
+                        try {
+                            HomeScreen.addressesList.add(getAddressFromLatLong(currentLocation.getLatitude(), currentLocation.getLongitude()));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                listViewAdapter.notifyDataSetChanged();
-                locationList.invalidateViews();
-                locationList.refreshDrawableState();
+                HomeScreen.listViewAdapter.notifyDataSetChanged();
+                HomeScreen.locationList.invalidateViews();
+                HomeScreen.locationList.refreshDrawableState();
 
 
             }
