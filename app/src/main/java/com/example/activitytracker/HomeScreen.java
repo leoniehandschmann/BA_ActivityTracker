@@ -34,6 +34,7 @@ public class HomeScreen extends Fragment {
     public static ArrayList<String> addresses;
     public static ArrayList<String> addressesList;
     public static ArrayAdapter <String> listViewAdapter;
+    private BarChart stepBarChart;
 
     ArrayList <BarEntry> barDataList;
 
@@ -45,47 +46,17 @@ public class HomeScreen extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.homescreen, container, false);
         locationList = (ListView) view.findViewById(R.id.location_list);
-        dbHelper db = new dbHelper(getActivity().getApplicationContext());
-        Cursor c = db.getData();
-        addresses = new ArrayList<String>();
-        addressesList = new ArrayList<String>();
+        stepBarChart = (BarChart) view.findViewById(R.id.step_chart);
+
+        initStepBarChart();
+        initLocationListView();
+        
+        return view;
+    }
 
 
-        /*while(c.moveToNext()){
-            for (int i = 0; i < c.getCount(); i++) {
-                        try {
-                            addresses[i] = LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)));
-                            listViewAdapter.notifyDataSetChanged();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-            }
-        }*/
 
-        if(c.moveToFirst()){
-            do{
-                try {
-                    addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2))));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } while (c.moveToNext());
-        }
-
-        Set<String> set = new HashSet<>();
-        for (String s : addresses) {
-            if (set.add(s)) {
-                addressesList.add(s);
-            }
-        }
-
-        listViewAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesList);
-
-
-        locationList.setAdapter(listViewAdapter);
-
-
-        BarChart stepBarChart = (BarChart) view.findViewById(R.id.step_chart);
+    private void initStepBarChart(){
 
         BarDataSet barDataSet = new BarDataSet(getBarData(),"Steps BarChart");
         BarData barData = new BarData();
@@ -113,10 +84,39 @@ public class HomeScreen extends Fragment {
         });
 
         stepBarChart.getXAxis().setAxisMinimum(0);
-
-
-        return view;
     }
+
+    private void initLocationListView(){
+        dbHelper db = new dbHelper(getActivity().getApplicationContext());
+        Cursor c = db.getData();
+        addresses = new ArrayList<String>();
+        addressesList = new ArrayList<String>();
+
+
+        if(c.moveToFirst()){
+            do{
+                try {
+                    addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2))));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } while (c.moveToNext());
+        }
+
+        Set<String> set = new HashSet<>();
+        for (String s : addresses) {
+            if (set.add(s)) {
+                addressesList.add(s);
+            }
+        }
+
+        listViewAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesList);
+
+
+        locationList.setAdapter(listViewAdapter);
+    }
+
+
 
     private ArrayList<BarEntry> getBarData(){
         barDataList = new ArrayList<BarEntry>();
@@ -129,6 +129,8 @@ public class HomeScreen extends Fragment {
         barDataList.add(new BarEntry(6.6f,70));
         return barDataList;
     }
+
+
 
 
 

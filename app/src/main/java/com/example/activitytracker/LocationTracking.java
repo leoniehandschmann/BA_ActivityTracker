@@ -454,25 +454,31 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 }
                 //Toast.makeText(getActivity().getApplicationContext(), "Location:"+locationResult.getLastLocation().getLongitude()+": "+locationResult.getLastLocation().getLatitude(), Toast.LENGTH_SHORT).show();
 
+                updateLocationListView(currentLocation);
 
-                try {
-                    if(!HomeScreen.addressesList.contains(getAddressFromLatLong(currentLocation.getLatitude(), currentLocation.getLongitude()))) {
-                        try {
-                            HomeScreen.addressesList.add(getAddressFromLatLong(currentLocation.getLatitude(), currentLocation.getLongitude()));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                HomeScreen.listViewAdapter.notifyDataSetChanged();
-                HomeScreen.locationList.invalidateViews();
-                HomeScreen.locationList.refreshDrawableState();
 
 
             }
         }, Looper.getMainLooper());
+    }
+
+
+    //update listview on homescreen --> dont add duplicates
+    public static void updateLocationListView(Location loc){
+        try {
+            if(!HomeScreen.addressesList.contains(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude()))) {
+                try {
+                    HomeScreen.addressesList.add(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        HomeScreen.listViewAdapter.notifyDataSetChanged();
+        HomeScreen.locationList.invalidateViews();
+        HomeScreen.locationList.refreshDrawableState();
     }
 
 
