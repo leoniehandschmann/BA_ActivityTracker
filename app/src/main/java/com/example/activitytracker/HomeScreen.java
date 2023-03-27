@@ -50,7 +50,7 @@ public class HomeScreen extends Fragment {
 
         initStepBarChart();
         initLocationListView();
-        
+
         return view;
     }
 

@@ -11,13 +11,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
+        android:layout_marginTop="20dp"
+        android:textSize="20dp"
+        android:textStyle="bold"
         android:text="Übersicht deiner Schritte in dieser Woche"/>
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/step_chart"
         android:layout_width="350dp"
         android:layout_height="300dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="80dp"
         android:layout_centerHorizontal="true"/>
 
     <TextView
@@ -25,14 +28,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:layout_marginTop="330dp"
+        android:layout_marginTop="450dp"
+        android:textSize="20dp"
+        android:textStyle="bold"
         android:text="Übersicht deiner Standorte heute"/>
 
     <ListView
         android:id="@+id/location_list"
         android:layout_width="300dp"
         android:layout_height="400dp"
-        android:layout_marginTop="350dp"
+        android:layout_marginTop="500dp"
         android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
