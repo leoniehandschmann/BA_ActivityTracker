@@ -49,7 +49,7 @@ public class HomeScreen extends Fragment {
         stepBarChart = (BarChart) view.findViewById(R.id.step_chart);
 
         initStepBarChart();
-        initLocationListView();
+        //initLocationListView();
 
         return view;
     }

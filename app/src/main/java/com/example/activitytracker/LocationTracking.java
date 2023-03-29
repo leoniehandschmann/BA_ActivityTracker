@@ -454,7 +454,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 }
                 //Toast.makeText(getActivity().getApplicationContext(), "Location:"+locationResult.getLastLocation().getLongitude()+": "+locationResult.getLastLocation().getLatitude(), Toast.LENGTH_SHORT).show();
 
-                updateLocationListView(currentLocation);
+                //updateLocationListView(currentLocation);
 
 
 
