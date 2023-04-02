@@ -78,8 +78,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 
@@ -108,10 +110,13 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     public static String[] longitudeArray;
     public static String[] timestampsArray;
     public static String[] addressArray;
-    public Polyline locationLine;
+
     public static Geocoder geocoder;
 
     public static List <Address> addresses;
+
+
+
     //public Cursor cursor;
 
 
@@ -125,7 +130,6 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         View view = inflater.inflate(R.layout.location_tracking, container, false);
         db = new dbHelper(getActivity().getApplicationContext());
         //db.deleteDataOlderThan24Hours();
-        //cursor = db.getData();
 
 
         viewDB = view.findViewById(R.id.viewDB);
@@ -147,7 +151,6 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
 
         if (permissionGranted) {
             if (checkGoogleServices()) {
-                //getLocation();
                 mapView.getMapAsync(LocationTracking.this);
                 mapView.onCreate(savedInstanceState);
                 if (permissionGranted){
@@ -159,12 +162,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         }
 
         viewLocationsInDB();
-        //getDataFromDBInArrays();
-        //for (int i = 0; i < latitudeArray.length; i++) {
-            //Log.d("arrayTest","Latitude " + i + ": " + latitudeArray[i] + "\n");
-            //Log.d("arrayTest","Longitude " + i + ": " + longitudeArray[i] + "\n");
-            //Log.d("arrayTest","Timestamp " + i + ": " + timestampsArray[i] + "\n");
-        //}
+
         return view;
     }
 
@@ -243,6 +241,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 }
             }
         }
+
     }
 
 
@@ -410,36 +409,16 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 Boolean checkInsert = db.insertData(currentLocation.getLatitude(),currentLocation.getLongitude(), timestamp);
                 getDataFromDBInArrays(getActivity().getApplicationContext());
 
-                String[] latArray =new String[3];
-                String[] longArray =new String[3];
-
-                latArray[0] = "49.0204";
-                latArray[1] = "49.0204";
-                latArray[2] = "49.0204";
-
-                longArray[0]= "12.1022";
-                longArray[1]= "12.1032";
-                longArray[2]= "12.1042";
-
 
                 PolylineOptions options = new PolylineOptions();
                 options.color(0xffff0000);
-                options.visible( true );
+                options.width(5);
 
-                /*for (int i = 0; i < latArray.length - 1; i++) {
-                    for (int ii = i + 1; ii < latArray.length; ii++) {
-                        if(latArray[i]==latArray[ii]){
-                            options.add(new LatLng(Double.parseDouble(latArray[i]),(Double.parseDouble(longArray[i])+0.0100000)));
-                        }else{
-                            options.add(new LatLng(Double.parseDouble(latArray[i]),(Double.parseDouble(longArray[i]))));
-                        }
-                    }
-                }*/
-                for (int i = 0; i < latitudeArray.length; i++) {
-                    options.add(new LatLng(Double.parseDouble(latitudeArray[i]),(Double.parseDouble(longitudeArray[i]))));
-                    //Log.d("arrayTest","Latitude " + i + ": " + latitudeArray[i] + "\n");
-                    //Log.d("arrayTest","Longitude " + i + ": " + longitudeArray[i] + "\n");
-                    //Log.d("arrayTest","Timestamp " + i + ": " + timestampsArray[i] + "\n");
+
+                Cursor cur = db.getData();
+                while(cur.moveToNext()){
+                    LatLng location = new LatLng(Double.parseDouble(cur.getString(1)), Double.parseDouble(cur.getString(2)));
+                    options.add(location);
                 }
 
                 googleMap.addPolyline(options);
@@ -515,27 +494,6 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         }
         googleMap.setMyLocationEnabled(true);
 
-        /*Polyline polyline1 = googleMap.addPolyline(new PolylineOptions()
-                .clickable(true)
-                .add(
-                        new LatLng(49.0204217, 12.1022117),
-                        new LatLng(49.0204217, 12.1322117),
-                        new LatLng(49.1204217,12.1422117)));
-        polyline1.setColor(0xffff0000);*/
-
-        //locationLine = googleMap.addPolyline(new PolylineOptions()
-                //.add(new LatLng(49.0204217, 12.1022117)));
-
-        /*Cursor curs = db.getData();
-        getDataFromDBInArrays();
-        List<LatLng> points=new ArrayList<LatLng>();
-        for (int i = 0 ; i < curs.getCount(); i++){
-            //locationLine = googleMap.addPolyline(new PolylineOptions()
-                    //.add(new LatLng(Double.parseDouble(latitudeArray[i]),(Double.parseDouble(longitudeArray[i])))));
-            points.add(new LatLng(Double.parseDouble(latitudeArray[i]),Double.parseDouble(longitudeArray[i])));
-        };
-        locationLine.setPoints(points);*/
-        //locationLine.setColor(0xffff0000);
 
 
 
