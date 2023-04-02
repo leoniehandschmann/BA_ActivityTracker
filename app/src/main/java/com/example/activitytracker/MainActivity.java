@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.main_activity);
         //setupNavigationView();
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.bottom_navigation);
+        BottomNavigationView navigation = findViewById(R.id.bottom_navigation);
         navigation.setOnItemSelectedListener(mOnNavigationItemSelectedListener);
 
         fm.beginTransaction().add(R.id.rootLayout, fragment5, "5").hide(fragment5).commit();
@@ -48,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private BottomNavigationView.OnItemSelectedListener mOnNavigationItemSelectedListener
+    private final BottomNavigationView.OnItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnItemSelectedListener() {
 
         @Override

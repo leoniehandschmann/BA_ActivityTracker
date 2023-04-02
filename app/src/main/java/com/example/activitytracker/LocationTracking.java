@@ -104,12 +104,14 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     public Location currentLocation;
     public static dbHelper db;
     public Button viewDB;
-    public static String latitudeArray[];
-    public static String longitudeArray[];
-    public static String timestampsArray[];
-    public static String addressArray[];
+    public static String[] latitudeArray;
+    public static String[] longitudeArray;
+    public static String[] timestampsArray;
+    public static String[] addressArray;
     public Polyline locationLine;
     public static Geocoder geocoder;
+
+    public static List <Address> addresses;
     //public Cursor cursor;
 
 
@@ -122,22 +124,22 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.location_tracking, container, false);
         db = new dbHelper(getActivity().getApplicationContext());
+        //db.deleteDataOlderThan24Hours();
         //cursor = db.getData();
 
-        geocoder = new Geocoder(getActivity().getApplicationContext(), Locale.getDefault());
 
-        viewDB = (Button) view.findViewById(R.id.viewDB);
+        viewDB = view.findViewById(R.id.viewDB);
 
-        counter = (TextView) view.findViewById(R.id.counter_view);
+        counter = view.findViewById(R.id.counter_view);
 
 
         sensorManager = (SensorManager) getActivity().getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
 
-        switchKM = (Switch) view.findViewById(R.id.switch_to_km);
+        switchKM = view.findViewById(R.id.switch_to_km);
         currentSteps = Integer.parseInt(counter.getText().toString());
         switcherChanged(currentSteps);
 
-        mapView = (MapView) view.findViewById(R.id.mapView);
+        mapView = view.findViewById(R.id.mapView);
         checkPermission();
 
         locationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
@@ -166,8 +168,8 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         return view;
     }
 
-    public static String getAddressFromLatLong(Double lat,Double lng) throws IOException {
-        List<Address> addresses;
+    public static String getAddressFromLatLong(Double lat,Double lng,Context context) throws IOException {
+        geocoder = new Geocoder(context, Locale.getDefault());
         addresses = geocoder.getFromLocation(lat, lng, 1);
         String address = addresses.get(0).getAddressLine(0);
         return "Addresse: " + address;
@@ -222,7 +224,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         });
     }
 
-    public static void getDataFromDBInArrays(){
+    public static void getDataFromDBInArrays(Context context){
         Cursor c = db.getData();
         latitudeArray =new String[c.getCount()];
         longitudeArray =new String[c.getCount()];
@@ -235,7 +237,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 longitudeArray[i] = c.getString(2);
                 timestampsArray[i] = c.getString(3);
                 try {
-                    addressArray[i] = getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)));
+                    addressArray[i] = getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)),context);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -406,10 +408,10 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 String timestamp = currentTime + " " + currentDate;
                 Log.d("locTrack","Location: "+ currentLocation.getLatitude() +": "+ currentLocation.getLongitude());
                 Boolean checkInsert = db.insertData(currentLocation.getLatitude(),currentLocation.getLongitude(), timestamp);
-                getDataFromDBInArrays();
+                getDataFromDBInArrays(getActivity().getApplicationContext());
 
-                String latArray[] =new String[3];
-                String longArray[] =new String[3];
+                String[] latArray =new String[3];
+                String[] longArray =new String[3];
 
                 latArray[0] = "49.0204";
                 latArray[1] = "49.0204";
@@ -443,7 +445,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 googleMap.addPolyline(options);
 
                 Log.d("insertDB",checkInsert.toString());
-                Log.d("insertDB",String.valueOf(currentLocation.getLatitude())+ " " + String.valueOf(currentLocation.getLongitude())+ " " +timestamp);
+                Log.d("insertDB", currentLocation.getLatitude() + " " + currentLocation.getLongitude() + " " +timestamp);
 
 
 
@@ -454,8 +456,11 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 }
                 //Toast.makeText(getActivity().getApplicationContext(), "Location:"+locationResult.getLastLocation().getLongitude()+": "+locationResult.getLastLocation().getLatitude(), Toast.LENGTH_SHORT).show();
 
-                //updateLocationListView(currentLocation);
-
+                try {
+                    updateLocationListView(currentLocation,getActivity().getApplicationContext());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
 
 
             }
@@ -464,21 +469,22 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
 
 
     //update listview on homescreen --> dont add duplicates
-    public static void updateLocationListView(Location loc){
-        try {
-            if(!HomeScreen.addressesList.contains(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude()))) {
-                try {
-                    HomeScreen.addressesList.add(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+    public static void updateLocationListView(Location loc,Context context) throws IOException {
+        String checkLoc = getAddressFromLatLong(loc.getLatitude(), loc.getLongitude(), context);
+        if(!HomeScreen.addressesList.contains(checkLoc)) {
+            try {
+                HomeScreen.addressesList.add(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude(), context));
+                DataExport.addressesListWODupli.add(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude(), context));
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
         HomeScreen.listViewAdapter.notifyDataSetChanged();
         HomeScreen.locationList.invalidateViews();
         HomeScreen.locationList.refreshDrawableState();
+
+        DataExport.listViewAdapter2.notifyDataSetChanged();
+        DataExport.locationListOverview.refreshDrawableState();
     }
 
 

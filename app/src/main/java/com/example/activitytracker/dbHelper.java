@@ -41,11 +41,7 @@ public class dbHelper extends SQLiteOpenHelper {
 
         //LocationDetails
         long result = db.insert("test",null, content);
-        if(result == -1){
-            return false;
-        }else{
-            return true;
-        }
+        return result != -1;
 
     }
 
@@ -57,11 +53,7 @@ public class dbHelper extends SQLiteOpenHelper {
         if(cursor.getCount()>1){
 
             long result = db.delete("LocationDetails","activity_id=?",new String[]{"activity_id"});
-            if(result == -1){
-                return false;
-            }else{
-                return true;
-            }
+            return result != -1;
 
         }else{
             return false;
@@ -77,6 +69,26 @@ public class dbHelper extends SQLiteOpenHelper {
         cursor.moveToFirst();
         return cursor;
     }
+
+
+    public Boolean deleteDataOlderThan24Hours(){
+        SQLiteDatabase db = this.getWritableDatabase();
+
+
+
+        Cursor cursor = db.rawQuery("Select * from test where timestamp <= date('now','-1 day')",null);
+        if(cursor.getCount()>1){
+
+            long result = db.delete("test","timestamp <= date('now','-1 day')", null);
+            return result != -1;
+
+        }else{
+            return false;
+        }
+
+    }
+
+
 
 
 

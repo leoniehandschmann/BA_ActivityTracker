@@ -45,11 +45,11 @@ public class HomeScreen extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.homescreen, container, false);
-        locationList = (ListView) view.findViewById(R.id.location_list);
-        stepBarChart = (BarChart) view.findViewById(R.id.step_chart);
+        locationList = view.findViewById(R.id.location_list);
+        stepBarChart = view.findViewById(R.id.step_chart);
 
         initStepBarChart();
-        //initLocationListView();
+        initLocationListView();
 
         return view;
     }
@@ -96,7 +96,7 @@ public class HomeScreen extends Fragment {
         if(c.moveToFirst()){
             do{
                 try {
-                    addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2))));
+                    addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
