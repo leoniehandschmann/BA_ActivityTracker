@@ -12,8 +12,14 @@ import androidx.annotation.Nullable;
 
 public class dbHelper extends SQLiteOpenHelper {
     //public dbHelper(Context context) {super(context, "LocationDataDB", null, 1);}
+
+    public String dbName;
+
+
+
     public dbHelper(Context context) {
         super(context, "testDB", null, 1);
+        //this.dbName = dbName;
     }
 
     @Override
@@ -26,7 +32,7 @@ public class dbHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //LocationDetails
-        db.execSQL("drop Table if exists tests");
+        db.execSQL("drop Table if exists test");
     }
 
 
@@ -45,21 +51,6 @@ public class dbHelper extends SQLiteOpenHelper {
 
     }
 
-
-    public Boolean deleteData(int id){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-        Cursor cursor = db.rawQuery("Select * from LocationDetails where activity_id = ?",new String[]{"activity_id"});
-        if(cursor.getCount()>1){
-
-            long result = db.delete("LocationDetails","activity_id=?",new String[]{"activity_id"});
-            return result != -1;
-
-        }else{
-            return false;
-        }
-
-    }
 
 
     public Cursor getData(){

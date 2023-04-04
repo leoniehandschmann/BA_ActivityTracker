@@ -44,6 +44,8 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
+import com.google.android.gms.internal.location.zzau;
+import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -271,7 +273,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     @Override
     public void onResume() {
         super.onResume();
-        mapView.onResume();
+        //mapView.onResume();
 
         running = true;
         Sensor countStepsSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
@@ -285,7 +287,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     @Override
     public void onPause() {
         super.onPause();
-        mapView.onPause();
+        //mapView.onPause();
 
         running = false;
         sensorManager.unregisterListener(this);
@@ -478,13 +480,15 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
 
         googleMap = map;
         LatLng latLng = new LatLng(49.015143, 12.101756);
-        //LatLng latLng = new LatLng(currentLocation.getLatitude(), currentLocation.getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
+        //LatLng latLng = new LatLng(googleMap.getMyLocation().getLatitude(), googleMap.getMyLocation().getLongitude());
+        /*MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.title("Current position");
         markerOptions.position(latLng);
-        googleMap.addMarker(markerOptions);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 8);
+        googleMap.addMarker(markerOptions);*/
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
         googleMap.animateCamera(cameraUpdate);
+
+
 
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setCompassEnabled(true);
