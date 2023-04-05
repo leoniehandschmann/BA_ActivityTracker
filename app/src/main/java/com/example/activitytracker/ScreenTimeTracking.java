@@ -7,13 +7,18 @@ import android.app.usage.UsageStats;
 import android.app.usage.UsageStatsManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -23,13 +28,16 @@ import androidx.fragment.app.Fragment;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class ScreenTimeTracking extends Fragment{
 
     private TextView tv_screenTime;
+    private TextView firstCell;
     private Long usageTimeMillis;
+    private TableLayout appTable;
 
     public ScreenTimeTracking(){
 
@@ -40,6 +48,10 @@ public class ScreenTimeTracking extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.screentime_tracking, container, false);
         tv_screenTime = view.findViewById(R.id.tv_usage);
+        firstCell = view.findViewById(R.id.first_cell);
+        appTable = view.findViewById(R.id.app_table);
+
+        installedApps();
 
         if(checkUsagePermission(getActivity().getApplicationContext())){
             showAppUsage();
@@ -67,11 +79,11 @@ public class ScreenTimeTracking extends Fragment{
             @Override
             public void run() {
                 try{
-                    getAppUsage(getActivity().getApplicationContext());
+                    getAppUsage(getActivity().getApplicationContext(),"com.google.android.calendar");
                     long minutes = TimeUnit.MILLISECONDS.toMinutes(usageTimeMillis);
                     long seconds = TimeUnit.MILLISECONDS.toSeconds(usageTimeMillis)
                             - TimeUnit.MINUTES.toSeconds(minutes);
-                    tv_screenTime.setText(String.valueOf(minutes) + " Minuten  " + String.valueOf(seconds) + " Sekunden");
+                    firstCell.setText(String.valueOf(minutes) + " Minuten  " + String.valueOf(seconds) + " Sekunden");
                 }
                 catch (Exception e) {
                     Log.d("updateTV","not successful");
@@ -85,12 +97,37 @@ public class ScreenTimeTracking extends Fragment{
 
     }
 
-    private long getAppUsage(Context c){
+    private long getAppUsage(Context c,String appPackage){
         UsageStatsManager usageStatsManager = (UsageStatsManager) c.getSystemService(Context.USAGE_STATS_SERVICE);
         long beginIntervalMillis = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000;
         Map<String, UsageStats> usageStatsMap = usageStatsManager.queryAndAggregateUsageStats(beginIntervalMillis,System.currentTimeMillis());
-        usageTimeMillis = usageStatsMap.get("com.google.android.calendar").getTotalTimeInForeground();
+        usageTimeMillis = usageStatsMap.get(appPackage).getTotalTimeInForeground();
         return usageTimeMillis;
+    }
+
+    private void setTableRows(){
+        TableRow tr = new TableRow(getActivity().getApplicationContext());
+        TextView t1 = new TextView(getActivity().getApplicationContext());
+        t1.setText("App Name");
+        tr.addView(t1);
+        TextView t2 = new TextView(getActivity().getApplicationContext());
+        t2.setText("Usage Time");
+        t2.setGravity(Gravity.RIGHT);
+        tr.addView(t2);
+        appTable.addView(tr);
+
+    }
+
+    public void installedApps()
+    {
+        List<PackageInfo> packList = getActivity().getApplicationContext().getPackageManager().getInstalledPackages(0);
+        for (int i=0; i < packList.size(); i++)
+        {
+            PackageInfo packInfo = packList.get(i);
+            String appName = packInfo.applicationInfo.loadLabel(getActivity().getApplicationContext().getPackageManager()).toString();
+            Log.d("appnam","App: " + Integer.toString(i) + " " + appName);
+
+        }
     }
 
 
