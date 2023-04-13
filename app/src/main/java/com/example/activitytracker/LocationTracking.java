@@ -44,8 +44,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.common.api.ResolvableApiException;
-import com.google.android.gms.internal.location.zzau;
-import com.google.android.gms.location.FusedLocationProviderApi;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -337,7 +335,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         if (result == ConnectionResult.SUCCESS) {
             return true;
         } else if (apiAvailability.isUserResolvableError(result)) {
-            Dialog d = apiAvailability.getErrorDialog(this, result, 201, new DialogInterface.OnCancelListener() {
+            Dialog d = apiAvailability.getErrorDialog(getActivity(), result, 201, new DialogInterface.OnCancelListener() {
                 @Override
                 public void onCancel(DialogInterface dialog) {
                     Toast.makeText(getActivity().getApplicationContext(), "User canceled dialog", Toast.LENGTH_SHORT).show();
