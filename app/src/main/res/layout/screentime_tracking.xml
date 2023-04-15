@@ -4,7 +4,6 @@
     android:id="@+id/linlay_screenTrack"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical">
 
 
@@ -12,18 +11,40 @@
         android:id="@+id/choose_life"
         android:layout_width="300dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
         android:gravity="center"
         android:text="Choose 'Life' Apps"
         android:background="@android:drawable/editbox_background"
         android:drawableEnd="@android:drawable/arrow_down_float"/>
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/app_table"
+        android:id="@+id/app_table_life"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
         android:stretchColumns="1"
         android:layout_gravity="center"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="50dp">
+    </TableLayout>
+
+    <TextView
+        android:id="@+id/choose_work"
+        android:layout_width="300dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="Choose 'Work' Apps"
+        android:background="@android:drawable/editbox_background"
+        android:drawableEnd="@android:drawable/arrow_down_float"/>
+
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/app_table_work"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:stretchColumns="1"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp">
     </TableLayout>
 
 </LinearLayout>

@@ -12,6 +12,9 @@ import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.ScaleDrawable;
 import android.os.Bundle;
@@ -30,6 +33,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 //import android.app.Fragment;
@@ -45,13 +49,19 @@ import java.util.concurrent.TimeUnit;
 public class ScreenTimeTracking extends Fragment{
 
     private TextView tv_choose_life_apps;
+    private TextView tv_choose_work_apps;
     private Long usageTimeMillis;
-    private TableLayout appTable;
+    private TableLayout appTable_Life;
+    private TableLayout appTable_Work;
     private List<String> appsPackList;
     private List<Drawable> appsIconsList;
-    private ArrayList<Integer> selectedAppsList;
-    private List<String> selectedPackages;
-    private boolean[] selectedLifeApps;
+    private ArrayList<Integer> selectedAppsList_Life;
+    private List<String> selectedPackages_Life;
+    private boolean[] selectedApps_Life;
+
+    private ArrayList<Integer> selectedAppsList_Work;
+    private List<String> selectedPackages_Work;
+    private boolean[] selectedApps_Work;
 
     public ScreenTimeTracking(){
 
@@ -62,11 +72,15 @@ public class ScreenTimeTracking extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.screentime_tracking, container, false);
         tv_choose_life_apps = view.findViewById(R.id.choose_life);
-        appTable = view.findViewById(R.id.app_table);
+        tv_choose_work_apps = view.findViewById(R.id.choose_work);
+        appTable_Life = view.findViewById(R.id.app_table_life);
+        appTable_Work = view.findViewById(R.id.app_table_work);
         appsPackList = new ArrayList<>();
         appsIconsList = new ArrayList<>();
-        selectedAppsList = new ArrayList<>();
-        selectedPackages = new ArrayList<>();
+        selectedAppsList_Life = new ArrayList<>();
+        selectedPackages_Life = new ArrayList<>();
+        selectedAppsList_Work = new ArrayList<>();
+        selectedPackages_Work = new ArrayList<>();
 
         try {
             getinstalledApps();
@@ -74,8 +88,11 @@ public class ScreenTimeTracking extends Fragment{
             throw new RuntimeException(e);
         }
 
-        selectedLifeApps = new boolean[appsPackList.size()];
-        initAppChooser(tv_choose_life_apps);
+        selectedApps_Life = new boolean[appsPackList.size()];
+        initAppChooser(tv_choose_life_apps,selectedApps_Life,selectedAppsList_Life,selectedPackages_Life);
+
+        selectedApps_Work = new boolean[appsPackList.size()];
+        initAppChooser(tv_choose_work_apps,selectedApps_Work,selectedAppsList_Work,selectedPackages_Work);
 
         if(checkUsagePermission(getActivity().getApplicationContext())){
             updateAppUsage();
@@ -103,12 +120,10 @@ public class ScreenTimeTracking extends Fragment{
             @Override
             public void run() {
                 try{
-                    int count = appTable.getChildCount();
-                    for (int i = 0; i < count; i++) {
-                        View child = appTable.getChildAt(i);
-                        if (child instanceof TableRow) ((ViewGroup) child).removeAllViews();
-                    }
-                setTableRows(selectedPackages);
+                    appTable_Life.removeAllViews();
+                    setTableRows(selectedPackages_Life,appTable_Life);
+                    appTable_Work.removeAllViews();
+                    setTableRows(selectedPackages_Work,appTable_Work);
                 }
                 catch (Exception e) {
                     Log.d("updateTV","not successful");
@@ -130,18 +145,18 @@ public class ScreenTimeTracking extends Fragment{
         return usageTimeMillis;
     }
 
-    private void setTableRows(List<String> packageList) throws PackageManager.NameNotFoundException {
+    private void setTableRows(List<String> packageList,TableLayout table) throws PackageManager.NameNotFoundException {
+
         for(int i = 0; i < packageList.size(); i++){
             TableRow tr = new TableRow(getActivity().getApplicationContext());
             Drawable icon = getActivity().getApplicationContext().getPackageManager().getApplicationIcon(packageList.get(i));
             ImageView imageView = new ImageView(getActivity().getApplicationContext());
             imageView.setImageDrawable(icon);
-            imageView.setMaxHeight(1);
-            imageView.setMaxWidth(1);
-
             tr.addView(imageView);
             TextView t1 = new TextView(getActivity().getApplicationContext());
             t1.setText(cutPackageName(packageList.get(i)));
+            t1.setTextSize(15);
+            t1.setPadding(50,100,0,0);
             tr.addView(t1);
 
             TextView t2 = new TextView(getActivity().getApplicationContext());
@@ -151,7 +166,7 @@ public class ScreenTimeTracking extends Fragment{
             t2.setText(String.valueOf(hours) + ":" + String.valueOf(minutes) + ":" + String.valueOf(seconds));
             t2.setGravity(Gravity.RIGHT);
             tr.addView(t2);
-            appTable.addView(tr);
+            table.addView(tr);
         }
 
     }
@@ -173,18 +188,34 @@ public class ScreenTimeTracking extends Fragment{
                     // system apps
                     Log.d("appnam","system: " + app.packageName);
                     appsPackList.add(app.packageName);
-                    appsIconsList.add(pm.getApplicationIcon(app.packageName));
+                    Drawable dr = pm.getApplicationIcon(app.packageName);
+                    Bitmap bitmap = getBitmapFromDrawable(dr);
+                    Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 1, 1, true));
+                    appsIconsList.add(d);
                 } else {
                     // user installed apps
                     Log.d("appnam","user installed: " + app.packageName);
                     appsPackList.add(app.packageName);
-                    appsIconsList.add(pm.getApplicationIcon(app.packageName));
+                    Drawable dr = pm.getApplicationIcon(app.packageName);
+                    Bitmap bitmap = getBitmapFromDrawable(dr);
+                    Drawable d = new BitmapDrawable(getResources(), Bitmap.createScaledBitmap(bitmap, 1, 1, true));
+                    appsIconsList.add(d);
                 }
             }
         }
         Log.d("pooh", String.valueOf(appsPackList));
 
     }
+
+
+    private Bitmap getBitmapFromDrawable(@NonNull Drawable drawable) {
+        final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        final Canvas canvas = new Canvas(bmp);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+        return bmp;
+    }
+
 
     private String cutPackageName(String packName){
         if(packName.contains("com.google.android.")){
@@ -207,7 +238,7 @@ public class ScreenTimeTracking extends Fragment{
         return packName;
     }
 
-    private void initAppChooser(TextView tv){
+    private void initAppChooser(TextView tv,boolean[]selectedApps,ArrayList<Integer> selectedAppsList,List<String> selectedPackages){
         String [] allAppNames = new String[appsPackList.size()];
         for(int i = 0; i < allAppNames.length; i++){
             allAppNames[i] = cutPackageName(appsPackList.get(i));
@@ -219,7 +250,7 @@ public class ScreenTimeTracking extends Fragment{
                 builder.setTitle("Select Apps");
                 builder.setCancelable(false);
 
-                builder.setMultiChoiceItems(allAppNames, selectedLifeApps, new DialogInterface.OnMultiChoiceClickListener() {
+                builder.setMultiChoiceItems(allAppNames, selectedApps, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         if(isChecked){
@@ -235,9 +266,11 @@ public class ScreenTimeTracking extends Fragment{
                         StringBuilder stringBuilder = new StringBuilder();
                         for(int i = 0; i<selectedAppsList.size();i++){
                             stringBuilder.append(allAppNames[selectedAppsList.get(i)]);
-                            selectedPackages.add(appsPackList.get(selectedAppsList.get(i)));
-                            if(i != selectedAppsList.size()-1){
-                                stringBuilder.append(", ");
+                            if(!selectedPackages.contains(appsPackList.get(selectedAppsList.get(i)))){
+                                selectedPackages.add(appsPackList.get(selectedAppsList.get(i)));
+                                if(i != selectedAppsList.size()-1){
+                                    stringBuilder.append(", ");
+                                }
                             }
                         }
                         tv.setText(stringBuilder.toString());
@@ -254,8 +287,8 @@ public class ScreenTimeTracking extends Fragment{
                 builder.setNeutralButton("Clear All", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        for(int i=0;i<selectedLifeApps.length;i++){
-                            selectedLifeApps[i] = false;
+                        for(int i=0;i<selectedApps.length;i++){
+                            selectedApps[i] = false;
                             selectedAppsList.clear();
                             selectedPackages.clear();
                             tv.setText("");
