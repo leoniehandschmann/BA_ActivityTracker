@@ -140,7 +140,11 @@ public class ScreenTimeTracking extends Fragment{
     private long getAppUsage(Context c,String appPackage){
         UsageStatsManager usageStatsManager = (UsageStatsManager) c.getSystemService(Context.USAGE_STATS_SERVICE);
         long beginIntervalMillis = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000;
-        Map<String, UsageStats> usageStatsMap = usageStatsManager.queryAndAggregateUsageStats(beginIntervalMillis,System.currentTimeMillis());
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Map<String, UsageStats> usageStatsMap = usageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(),System.currentTimeMillis());
         usageTimeMillis = usageStatsMap.get(appPackage).getTotalTimeInForeground();
         return usageTimeMillis;
     }

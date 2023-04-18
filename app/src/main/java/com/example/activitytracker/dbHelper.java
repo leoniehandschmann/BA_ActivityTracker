@@ -18,21 +18,21 @@ public class dbHelper extends SQLiteOpenHelper {
 
 
     public dbHelper(Context context) {
-        super(context, "testDB", null, 1);
+        super(context, "LocationDB", null, 1);
         //this.dbName = dbName;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         //LocationDetails
-        db.execSQL("create Table test(activity_id INTEGER PRIMARY KEY AUTOINCREMENT, latitude DOUBLE, longitude DOUBLE, timestamp STRING)");
+        db.execSQL("create Table locations(activity_id INTEGER PRIMARY KEY AUTOINCREMENT, latitude DOUBLE, longitude DOUBLE, timestamp STRING)");
 
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         //LocationDetails
-        db.execSQL("drop Table if exists test");
+        db.execSQL("drop Table if exists locations");
     }
 
 
@@ -46,7 +46,7 @@ public class dbHelper extends SQLiteOpenHelper {
         Log.d("dbhelper",content.toString());
 
         //LocationDetails
-        long result = db.insert("test",null, content);
+        long result = db.insert("locations",null, content);
         return result != -1;
 
     }
@@ -56,7 +56,7 @@ public class dbHelper extends SQLiteOpenHelper {
     public Cursor getData(){
         SQLiteDatabase db = this.getWritableDatabase();
         //LocationDetails
-        Cursor cursor = db.rawQuery("Select * from test", null);
+        Cursor cursor = db.rawQuery("Select * from locations", null);
         cursor.moveToFirst();
         return cursor;
     }
@@ -67,10 +67,10 @@ public class dbHelper extends SQLiteOpenHelper {
 
 
 
-        Cursor cursor = db.rawQuery("Select * from test where timestamp <= date('now','-1 day')",null);
+        Cursor cursor = db.rawQuery("Select * from locations where timestamp <= date('now','-1 day')",null);
         if(cursor.getCount()>1){
 
-            long result = db.delete("test","timestamp <= date('now','-1 day')", null);
+            long result = db.delete("locations","timestamp <= date('now','-1 day')", null);
             return result != -1;
 
         }else{

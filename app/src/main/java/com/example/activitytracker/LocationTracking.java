@@ -1,8 +1,11 @@
 package com.example.activitytracker;
 
 
+import static android.app.AppOpsManager.MODE_ALLOWED;
+
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.AppOpsManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -159,6 +162,8 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "Google Services not available", Toast.LENGTH_SHORT).show();
             }
+        }else{
+            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS));
         }
 
         viewLocationsInDB();
