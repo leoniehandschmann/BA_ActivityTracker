@@ -9,7 +9,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 //import android.app.Fragment;
 import androidx.fragment.app.Fragment;
 
@@ -37,7 +36,7 @@ public class DataExport extends Fragment{
 
 
     private void initLocationOverview(){
-        dbHelper db = new dbHelper(getActivity().getApplicationContext());
+        location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
         addressesFromDB = new ArrayList<String>();
         addressesListWODupli = new ArrayList<String>();

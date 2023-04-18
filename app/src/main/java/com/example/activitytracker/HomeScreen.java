@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.logging.Logger;
 
 public class HomeScreen extends Fragment {
 
@@ -87,7 +86,7 @@ public class HomeScreen extends Fragment {
     }
 
     private void initLocationListView(){
-        dbHelper db = new dbHelper(getActivity().getApplicationContext());
+        location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
         addresses = new ArrayList<String>();
         addressesList = new ArrayList<String>();

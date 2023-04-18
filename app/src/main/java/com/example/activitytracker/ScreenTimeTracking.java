@@ -62,6 +62,7 @@ public class ScreenTimeTracking extends Fragment{
     private ArrayList<Integer> selectedAppsList_Work;
     private List<String> selectedPackages_Work;
     private boolean[] selectedApps_Work;
+    public static screenTime_dbHelper screenTime_db;
 
     public ScreenTimeTracking(){
 
@@ -81,6 +82,8 @@ public class ScreenTimeTracking extends Fragment{
         selectedPackages_Life = new ArrayList<>();
         selectedAppsList_Work = new ArrayList<>();
         selectedPackages_Work = new ArrayList<>();
+
+        screenTime_db = new screenTime_dbHelper(getActivity().getApplicationContext());
 
         try {
             getinstalledApps();

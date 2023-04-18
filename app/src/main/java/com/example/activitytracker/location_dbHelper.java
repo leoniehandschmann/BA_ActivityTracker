@@ -6,18 +6,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
-import androidx.annotation.Nullable;
-
-public class dbHelper extends SQLiteOpenHelper {
+public class location_dbHelper extends SQLiteOpenHelper {
     //public dbHelper(Context context) {super(context, "LocationDataDB", null, 1);}
 
     public String dbName;
 
 
 
-    public dbHelper(Context context) {
+    public location_dbHelper(Context context) {
         super(context, "LocationDB", null, 1);
         //this.dbName = dbName;
     }

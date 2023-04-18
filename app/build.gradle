@@ -37,6 +37,7 @@ dependencies {
     implementation 'com.crashlytics.sdk.android:crashlytics:2.10.1'
     implementation 'com.google.android.gms:play-services-maps:18.1.0'
     implementation 'com.google.android.gms:play-services-location:21.0.1'
+    implementation 'com.google.android.libraries.places:places:3.0.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'com.karumi:dexter:6.2.3'
     testImplementation 'junit:junit:4.13.2'

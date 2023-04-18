@@ -1,11 +1,8 @@
 package com.example.activitytracker;
 
 
-import static android.app.AppOpsManager.MODE_ALLOWED;
-
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.AppOpsManager;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -13,7 +10,6 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -35,10 +31,8 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.ListView;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -61,12 +55,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 //import com.google.android.gms.location.LocationRequest;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
@@ -76,15 +67,10 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TimeZone;
 
 
@@ -107,7 +93,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     public LocationRequest locationRequest;
     public FusedLocationProviderClient locationProviderClient;
     public Location currentLocation;
-    public static dbHelper db;
+    public static location_dbHelper location_db;
     public Button viewDB;
     public static String[] latitudeArray;
     public static String[] longitudeArray;
@@ -131,7 +117,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.location_tracking, container, false);
-        db = new dbHelper(getActivity().getApplicationContext());
+        location_db = new location_dbHelper(getActivity().getApplicationContext());
         //db.deleteDataOlderThan24Hours();
 
 
@@ -168,14 +154,23 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
 
         viewLocationsInDB();
 
+
         return view;
     }
 
     public static String getAddressFromLatLong(Double lat,Double lng,Context context) throws IOException {
+
         geocoder = new Geocoder(context, Locale.getDefault());
         addresses = geocoder.getFromLocation(lat, lng, 1);
         String address = addresses.get(0).getAddressLine(0);
-        return "Addresse: " + address;
+        /*String knownName = addresses.get(0).getLocality();
+        if(knownName != null){
+            return knownName + "\n" + address;
+        }else{
+            return address;
+        }*/
+        return address;
+
     }
 
     public static String realTime(Date d)
@@ -205,7 +200,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
             public void onClick(View v) {
                 //Cursor res = db.getReadableDatabase().rawQuery("Select * from LocationDetails", null);
                 //res.moveToFirst();
-                Cursor cursor = db.getData();
+                Cursor cursor = location_db.getData();
                 if(cursor.getCount()==0){
                     Toast.makeText(getActivity().getApplicationContext(), "empty DB", Toast.LENGTH_SHORT).show();
                     return;
@@ -228,7 +223,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     }
 
     public static void getDataFromDBInArrays(Context context){
-        Cursor c = db.getData();
+        Cursor c = location_db.getData();
         latitudeArray =new String[c.getCount()];
         longitudeArray =new String[c.getCount()];
         timestampsArray = new String[c.getCount()];
@@ -411,7 +406,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 String currentDate = realDate(date);
                 String timestamp = currentTime + " " + currentDate;
                 Log.d("locTrack","Location: "+ currentLocation.getLatitude() +": "+ currentLocation.getLongitude());
-                Boolean checkInsert = db.insertData(currentLocation.getLatitude(),currentLocation.getLongitude(), timestamp);
+                Boolean checkInsert = location_db.insertData(currentLocation.getLatitude(),currentLocation.getLongitude(), timestamp);
                 getDataFromDBInArrays(getActivity().getApplicationContext());
 
 
@@ -420,7 +415,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
                 options.width(5);
 
 
-                Cursor cur = db.getData();
+                Cursor cur = location_db.getData();
                 while(cur.moveToNext()){
                     LatLng location = new LatLng(Double.parseDouble(cur.getString(1)), Double.parseDouble(cur.getString(2)));
                     options.add(location);
