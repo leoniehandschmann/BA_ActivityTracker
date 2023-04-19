@@ -7,6 +7,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
+
 public class location_dbHelper extends SQLiteOpenHelper {
     //public dbHelper(Context context) {super(context, "LocationDataDB", null, 1);}
 
@@ -73,8 +78,8 @@ public class location_dbHelper extends SQLiteOpenHelper {
         }else{
             return false;
         }
-
     }
+
 
 
 

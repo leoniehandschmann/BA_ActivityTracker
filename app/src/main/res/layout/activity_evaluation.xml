@@ -3,14 +3,19 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:id="@+id/main_eval_layout"
     android:orientation="vertical">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
+        android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="this is the activity evaluation"/>
+        android:layout_marginTop="30dp"
+        android:layout_marginBottom="30dp"
+        android:background="@color/quantum_grey100"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:text="Bitte bewerten Sie hier Ihre heutigen Aktivitäten. \n\n Dies ist eine subjektive Einschätzung Ihrer Empfindungen. \n Es besteht die Möglichkeit die Daten sowohl positiv als auch negativ zu bewerten. \n\n Falls die dargestellten Daten für Sie irrelevant sind, löschen Sie diese bitte durch einen Click auf den Mülleimer."/>
+
+
 
 </LinearLayout>

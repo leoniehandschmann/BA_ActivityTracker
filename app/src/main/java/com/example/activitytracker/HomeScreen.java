@@ -1,5 +1,6 @@
 package com.example.activitytracker;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -85,6 +86,32 @@ public class HomeScreen extends Fragment {
         stepBarChart.getXAxis().setAxisMinimum(0);
     }
 
+    public static void getLocationsFromDBWODupli(Context context, ArrayList<String> locs, ArrayList<String>locsWODuplicates){
+        location_dbHelper db = new location_dbHelper(context);
+        Cursor c = db.getData();
+        locs = new ArrayList<String>();
+        locsWODuplicates = new ArrayList<String>();
+
+
+        if(c.moveToFirst()){
+            do{
+                try {
+                    locs.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), context));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } while (c.moveToNext());
+        }
+
+        Set<String> set = new HashSet<>();
+        for (String s : locs) {
+            if (set.add(s)) {
+                locsWODuplicates.add(s);
+            }
+        }
+    }
+
+
     private void initLocationListView(){
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
@@ -108,6 +135,11 @@ public class HomeScreen extends Fragment {
                 addressesList.add(s);
             }
         }
+
+        //getLocationsFromDBWODupli(getActivity().getApplicationContext(),addresses,addressesList);
+
+        /*location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
+        db.getDataWODuplicates(getActivity().getApplicationContext(),addresses,addressesList);*/
 
         listViewAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesList);
 

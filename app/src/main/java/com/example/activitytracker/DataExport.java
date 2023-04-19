@@ -59,6 +59,8 @@ public class DataExport extends Fragment{
             }
         }
 
+        //HomeScreen.getLocationsFromDBWODupli(getActivity().getApplicationContext(),addressesFromDB,addressesListWODupli);
+
         listViewAdapter2 = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesListWODupli);
 
 
