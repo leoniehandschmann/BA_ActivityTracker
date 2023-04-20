@@ -10,6 +10,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+        android:id="@+id/activity_name_layout"
         android:layout_gravity="center" >
 
         <TextView
@@ -21,6 +22,7 @@
         <ImageButton
             android:layout_width="40dp"
             android:layout_height="40dp"
+            android:id="@+id/delete_btn"
             android:layout_marginLeft="50dp"
             android:src="@drawable/delete_button_selector"
             android:focusable="true"
