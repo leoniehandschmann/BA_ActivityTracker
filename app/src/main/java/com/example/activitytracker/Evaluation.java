@@ -32,14 +32,12 @@ public class Evaluation extends Fragment{
 
     private ArrayList<String> locationsFromDB;
     private ArrayList<String> locWODupli;
-
     private evaluation_dbHelper evaluation_db;
     private String activityName;
     private int evaluationVal;
     private Button submit_btn;
     private TextView tv;
     private LinearLayout parent;
-    private ImageButton deleteBtn;
     private View custom;
 
     @Nullable

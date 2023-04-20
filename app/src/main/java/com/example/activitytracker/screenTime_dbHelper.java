@@ -16,7 +16,7 @@ public class screenTime_dbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("create Table screenTimes(activity_id INTEGER PRIMARY KEY AUTOINCREMENT, appName STRING, usageTime DOUBLE)");
+        db.execSQL("create Table screenTimes(activity_id INTEGER PRIMARY KEY AUTOINCREMENT,classifier String, appName STRING, usageTime LONG)");
 
     }
 
@@ -26,10 +26,11 @@ public class screenTime_dbHelper extends SQLiteOpenHelper {
     }
 
 
-    public Boolean insertData(String appName,Double usageTime){
+    public Boolean insertData(String classifier,String appName,Long usageTime){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues content = new ContentValues();
+        content.put("classifier",classifier);
         content.put("appName",appName);
         content.put("usageTime",usageTime);
         Log.d("dbhelper",content.toString());

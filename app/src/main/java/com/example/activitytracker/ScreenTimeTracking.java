@@ -50,17 +50,17 @@ public class ScreenTimeTracking extends Fragment{
 
     private TextView tv_choose_life_apps;
     private TextView tv_choose_work_apps;
-    private Long usageTimeMillis;
+
     private TableLayout appTable_Life;
     private TableLayout appTable_Work;
     private List<String> appsPackList;
     private List<Drawable> appsIconsList;
     private ArrayList<Integer> selectedAppsList_Life;
-    private List<String> selectedPackages_Life;
+    public static List<String> selectedPackages_Life;
     private boolean[] selectedApps_Life;
 
     private ArrayList<Integer> selectedAppsList_Work;
-    private List<String> selectedPackages_Work;
+    public static List<String> selectedPackages_Work;
     private boolean[] selectedApps_Work;
     public static screenTime_dbHelper screenTime_db;
 
@@ -140,7 +140,7 @@ public class ScreenTimeTracking extends Fragment{
 
     }
 
-    private long getAppUsage(Context c,String appPackage){
+    public static long getAppUsage(Context c,String appPackage){
         UsageStatsManager usageStatsManager = (UsageStatsManager) c.getSystemService(Context.USAGE_STATS_SERVICE);
         long beginIntervalMillis = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000;
         Calendar cal = Calendar.getInstance();
@@ -148,7 +148,7 @@ public class ScreenTimeTracking extends Fragment{
         cal.set(Calendar.MINUTE, 0);
         cal.set(Calendar.SECOND, 0);
         Map<String, UsageStats> usageStatsMap = usageStatsManager.queryAndAggregateUsageStats(cal.getTimeInMillis(),System.currentTimeMillis());
-        usageTimeMillis = usageStatsMap.get(appPackage).getTotalTimeInForeground();
+        long usageTimeMillis = usageStatsMap.get(appPackage).getTotalTimeInForeground();
         return usageTimeMillis;
     }
 
@@ -224,7 +224,7 @@ public class ScreenTimeTracking extends Fragment{
     }
 
 
-    private String cutPackageName(String packName){
+    public static String cutPackageName(String packName){
         if(packName.contains("com.google.android.")){
             return packName.substring(19);
         }else if (packName.contains("com.google.")) {
