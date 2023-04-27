@@ -103,6 +103,7 @@ public class ScreenTimeTracking extends Fragment{
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
         }
 
+        Log.d("diego", String.valueOf(appsPackList));
 
         return view;
     }
@@ -230,8 +231,14 @@ public class ScreenTimeTracking extends Fragment{
 
 
     public static String cutPackageName(String packName){
-        if(packName.contains("com.google.android.")){
+        if (packName.contains("com.google.android.apps.")) {
+            return packName.substring(24);
+        }else if(packName.contains("com.google.android.")) {
             return packName.substring(19);
+        }else if (packName.contains("com.android.")) {
+                return packName.substring(12);
+        }else if (packName.contains("com.example.")) {
+            return packName.substring(12);
         }else if (packName.contains("com.google.")) {
             return packName.substring(11);
         }else if (packName.contains("com.app.")){
@@ -240,12 +247,6 @@ public class ScreenTimeTracking extends Fragment{
             return packName.substring(4);
         }else if (packName.contains("apps.")) {
             return packName.substring(5);
-        }else if (packName.contains("com.google.android.apps.")) {
-            return packName.substring(24);
-        }else if (packName.contains("com.android.")) {
-            return packName.substring(12);
-        }else if (packName.contains("com.example.")) {
-            return packName.substring(12);
         }
         return packName;
     }
@@ -286,7 +287,6 @@ public class ScreenTimeTracking extends Fragment{
                             }
                         }
                         tv.setText(stringBuilder.toString());
-                        Log.d("diego", String.valueOf(selectedPackages));
                     }
                 });
                 builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {

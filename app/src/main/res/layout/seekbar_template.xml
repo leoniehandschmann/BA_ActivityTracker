@@ -52,20 +52,40 @@
         android:layout_marginBottom="50dp">
 
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/sad_smiley"
-            android:layout_marginLeft="8dp"/>
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/absolut_sad"
+            android:layout_marginLeft="7dp"/>
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/neutral_smiley"
-            android:layout_marginLeft="137dp"/>
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/sad"
+            android:layout_marginLeft="27dp"/>
         <ImageView
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:src="@drawable/happy_smiley"
-            android:layout_marginLeft="140dp"/>
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/less_sad"
+            android:layout_marginLeft="27dp"/>
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/neutral"
+            android:layout_marginLeft="27dp"/>
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/less_happy"
+            android:layout_marginLeft="29dp"/>
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/happy"
+            android:layout_marginLeft="29dp"/>
+        <ImageView
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:src="@drawable/absolut_happy"
+            android:layout_marginLeft="29dp"/>
     </LinearLayout>
 
 
