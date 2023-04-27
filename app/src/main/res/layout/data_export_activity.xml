@@ -52,7 +52,7 @@
         android:stretchColumns="1"
         android:id="@+id/overview_screenTime_table_life"
         android:layout_gravity="center"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="10dp">
     </TableLayout>
 
     <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -61,7 +61,7 @@
         android:stretchColumns="1"
         android:id="@+id/overview_screenTime_table_work"
         android:layout_gravity="center"
-        android:layout_marginTop="40dp">
+        android:layout_marginTop="20dp">
     </TableLayout>
 
 

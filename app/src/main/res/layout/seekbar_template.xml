@@ -7,7 +7,7 @@
     android:orientation="vertical">
 
     <LinearLayout
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:id="@+id/activity_name_layout"
@@ -18,12 +18,14 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
             android:id="@+id/activity_name"
+            android:textSize="15dp"
+            android:textStyle="bold"
+            android:layout_weight="1"
             android:text="Aktivität"/>
         <ImageButton
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:id="@+id/delete_btn"
-            android:layout_marginLeft="50dp"
             android:src="@drawable/delete_button_selector"
             android:focusable="true"
             android:tooltipText="Wenn diese Aktivität irrelevant ist, lösche diese Bitte aus der Ansicht!"
@@ -37,9 +39,9 @@
         style="@style/Widget.AppCompat.SeekBar.Discrete"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:max="10"
+        android:max="6"
         android:layout_gravity="center"
-        android:progress="5"/>
+        android:progress="3"/>
 
     <LinearLayout
         android:layout_width="350dp"
@@ -49,21 +51,21 @@
         android:orientation="horizontal"
         android:layout_marginBottom="50dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-5"
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/sad_smiley"
             android:layout_marginLeft="8dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="0"
-            android:layout_marginLeft="152dp"/>
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="5"
-            android:layout_marginLeft="150dp"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/neutral_smiley"
+            android:layout_marginLeft="137dp"/>
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/happy_smiley"
+            android:layout_marginLeft="140dp"/>
     </LinearLayout>
 
 

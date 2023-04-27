@@ -53,42 +53,20 @@ public class DataExport extends Fragment{
         table_life = view.findViewById(R.id.overview_screenTime_table_life);
         table_work = view.findViewById(R.id.overview_screenTime_table_work);
 
+        initScreenTimeOverview();
+
+        return view;
+    }
+
+    private void initScreenTimeOverview(){
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
 
             @Override
             public void run() {
                 try{
-                    table_life.removeAllViews();
-                    table_work.removeAllViews();
-                    for(int i=0; i <ScreenTimeTracking.selectedPackages_Life.size();i++){
-                        TableRow tr = new TableRow(getActivity().getApplicationContext());
-                        TextView t1 = new TextView(getActivity().getApplicationContext());
-                        t1.setText(ScreenTimeTracking.cutPackageName(ScreenTimeTracking.selectedPackages_Life.get(i)));
-                        t1.setPadding(50,100,0,0);
-                        tr.addView(t1);
-
-                        TextView t2 = new TextView(getActivity().getApplicationContext());
-                        t2.setText(calcMillis(ScreenTimeTracking.getAppUsage(getActivity().getApplicationContext(),ScreenTimeTracking.selectedPackages_Life.get(i))));
-                        t2.setGravity(Gravity.RIGHT);
-                        tr.addView(t2);
-                        table_life.addView(tr);
-                    }
-
-                    for(int i=0; i <ScreenTimeTracking.selectedPackages_Work.size();i++){
-                        TableRow tr = new TableRow(getActivity().getApplicationContext());
-                        TextView t1 = new TextView(getActivity().getApplicationContext());
-                        t1.setText(ScreenTimeTracking.cutPackageName(ScreenTimeTracking.selectedPackages_Work.get(i)));
-                        t1.setPadding(50,100,0,0);
-                        tr.addView(t1);
-
-                        TextView t2 = new TextView(getActivity().getApplicationContext());
-                        t2.setText(calcMillis(ScreenTimeTracking.getAppUsage(getActivity().getApplicationContext(),ScreenTimeTracking.selectedPackages_Work.get(i))));
-                        t2.setGravity(Gravity.RIGHT);
-                        tr.addView(t2);
-                        table_work.addView(tr);
-                    }
-
+                    ScreenTimeTracking.setTableRows(ScreenTimeTracking.selectedPackages_Life,table_life,getActivity().getApplicationContext(),true);
+                    ScreenTimeTracking.setTableRows(ScreenTimeTracking.selectedPackages_Work,table_work,getActivity().getApplicationContext(),true);
                 }
                 catch (Exception e) {
                     Log.d("updateTV","not successful");
@@ -99,10 +77,6 @@ public class DataExport extends Fragment{
             }
         };
         handler.postDelayed(runnable, 30000);
-
-
-
-        return view;
     }
 
     private void saveScreenTimeBtnClick(){
@@ -137,12 +111,7 @@ public class DataExport extends Fragment{
 
     }
 
-    private String calcMillis(Long millis){
-        int seconds = (int) (millis / 1000) % 60 ;
-        int minutes = (int) (millis / (1000*60)) % 60;
-        int hours   = (int) (millis / (1000*60*60)) % 24;
-        return hours + ":" +minutes + ":" + seconds;
-    }
+
 
     private void initLocationOverview(){
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
@@ -168,10 +137,7 @@ public class DataExport extends Fragment{
             }
         }
 
-        //HomeScreen.getLocationsFromDBWODupli(getActivity().getApplicationContext(),addressesFromDB,addressesListWODupli);
-
         listViewAdapter2 = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesListWODupli);
-
 
         locationListOverview.setAdapter(listViewAdapter2);
     }

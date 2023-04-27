@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -36,9 +38,14 @@ public class Evaluation extends Fragment{
     private String activityName;
     private int evaluationVal;
     private Button submit_btn;
-    private TextView tv;
+    private TextView tv_loc;
+    private TextView tv_life;
+    private TextView tv_work;
     private LinearLayout parent;
-    private View custom;
+    private View locationEvalView;
+    private View screenTimeEvalView_life;
+    private View screenTimeEvalView_work;
+    private LinearLayout mainLL;
 
     @Nullable
     @Override
@@ -48,36 +55,80 @@ public class Evaluation extends Fragment{
             inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         parent = (LinearLayout) inflater.inflate(R.layout.activity_evaluation, null);
+        mainLL = parent.findViewById(R.id.main_eval_layout);
 
 
         evaluation_db = new evaluation_dbHelper(getActivity().getApplicationContext());
 
-        /*deleteBtn = custom.findViewById(R.id.delete_btn);
-        deleteBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d("hihi","clickicklick");
-            }
-        });*/
 
 
+        //init location evaluations
         getLocationData();
         if(locWODupli.size() != 0){
             for (int i = 0; i < locWODupli.size(); i++) {
-                custom = inflater.inflate(R.layout.seekbar_template, null);
-                tv = (TextView) custom.findViewById(R.id.activity_name);
-                tv.setText(locWODupli.get(i));
-                parent.addView(custom);
+                locationEvalView = inflater.inflate(R.layout.seekbar_template, null);
+                tv_loc = (TextView) locationEvalView.findViewById(R.id.activity_name);
+                tv_loc.setText(locWODupli.get(i));
+                mainLL.addView(locationEvalView);
             }
         }
 
+        //init app usage screenTime evaluations
+        initUsageRows(inflater);
 
-        initBtn();
-        SubmitAndSaveInDB();
         initDeleteBtn();
+        initBtn();
+        submitAndSaveInDB();
 
         return parent;
     }
+
+
+    private void initUsageRows(LayoutInflater inflater){
+        final Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try{
+                    mainLL.removeView(screenTimeEvalView_life);
+                    if(ScreenTimeTracking.selectedPackages_Life.size() != 0 ){
+                        for (int i = 0; i < ScreenTimeTracking.selectedPackages_Life.size(); i++) {
+                            screenTimeEvalView_life = inflater.inflate(R.layout.seekbar_template, null);
+                            tv_life = (TextView) screenTimeEvalView_life.findViewById(R.id.activity_name);
+                            String s = "App: " + ScreenTimeTracking.cutPackageName(ScreenTimeTracking.selectedPackages_Life.get(i)) + "\n" + "Heutige Nutzung: " + ScreenTimeTracking.calcMillis(ScreenTimeTracking.getAppUsage(getActivity().getApplicationContext(),ScreenTimeTracking.selectedPackages_Life.get(i)));
+                            tv_life.setText(s);
+                            mainLL.addView(screenTimeEvalView_life);
+                        }
+                    }
+                    mainLL.removeView(screenTimeEvalView_work);
+                    if(ScreenTimeTracking.selectedPackages_Work.size() != 0){
+                        for (int i = 0; i < ScreenTimeTracking.selectedPackages_Work.size(); i++) {
+                            screenTimeEvalView_work = inflater.inflate(R.layout.seekbar_template, null);
+                            tv_work = (TextView) screenTimeEvalView_work.findViewById(R.id.activity_name);
+                            String s = "App: " + ScreenTimeTracking.cutPackageName(ScreenTimeTracking.selectedPackages_Work.get(i)) + "\n" + "Heutige Nutzung: " + ScreenTimeTracking.calcMillis(ScreenTimeTracking.getAppUsage(getActivity().getApplicationContext(),ScreenTimeTracking.selectedPackages_Work.get(i)));
+                            tv_work.setText(s);
+                            mainLL.addView(screenTimeEvalView_work);
+                        }
+                    }
+                    mainLL.removeView(submit_btn);
+                    initBtn();
+                    initDeleteBtn();
+                    submitAndSaveInDB();
+
+
+                }
+                catch (Exception e) {
+                    Log.d("updateTV","not successful");
+                }
+                finally{
+                    handler.postDelayed(this, 30000);
+                }
+            }
+        };
+        handler.postDelayed(runnable, 30000);
+    }
+
 
     private void initBtn(){
         submit_btn = new Button(getActivity().getApplicationContext());
@@ -86,12 +137,12 @@ public class Evaluation extends Fragment{
         ViewGroup.LayoutParams params = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         submit_btn.setLayoutParams(params);
 
-        parent.addView(submit_btn);
+        mainLL.addView(submit_btn);
 
     }
 
     private void initDeleteBtn(){
-        LinearLayout mainLL = parent.findViewById(R.id.main_eval_layout);
+
         //activity evaluation layout
         for (int i = 0; i < mainLL.getChildCount(); i++) {
             View view = mainLL.getChildAt(i);
@@ -110,7 +161,7 @@ public class Evaluation extends Fragment{
                                 view3.setOnClickListener(new View.OnClickListener() {
                                     @Override
                                     public void onClick(View v) {
-                                        parent.removeView(view);
+                                        mainLL.removeView(view);
                                     }
                                 });
                             }
@@ -155,32 +206,24 @@ public class Evaluation extends Fragment{
 
     private int getRealVal(int val){
         if(val == 0){
-            val = -5;
-        }else if( val == 1){
-            val = -4;
-        }else if( val == 2){
             val = -3;
-        }else if( val == 3){
+        }else if( val == 1){
             val = -2;
-        }else if( val == 4){
+        }else if( val == 2){
             val = -1;
-        }else if( val == 5){
+        }else if( val == 3){
             val = 0;
-        }else if( val == 6){
+        }else if( val == 4){
             val = 1;
-        }else if( val == 7){
+        }else if( val == 5){
             val = 2;
-        }else if( val == 8){
+        }else if( val == 6){
             val = 3;
-        }else if( val == 9){
-            val = 4;
-        }else if( val == 10){
-            val = 5;
         }
         return val;
     }
 
-    private void SubmitAndSaveInDB(){
+    private void submitAndSaveInDB(){
         submit_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

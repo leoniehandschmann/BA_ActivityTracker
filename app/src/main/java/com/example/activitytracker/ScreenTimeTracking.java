@@ -123,10 +123,8 @@ public class ScreenTimeTracking extends Fragment{
             @Override
             public void run() {
                 try{
-                    appTable_Life.removeAllViews();
-                    setTableRows(selectedPackages_Life,appTable_Life);
-                    appTable_Work.removeAllViews();
-                    setTableRows(selectedPackages_Work,appTable_Work);
+                    setTableRows(selectedPackages_Life,appTable_Life,getActivity().getApplicationContext(),true);
+                    setTableRows(selectedPackages_Work,appTable_Work,getActivity().getApplicationContext(),true);
                 }
                 catch (Exception e) {
                     Log.d("updateTV","not successful");
@@ -142,7 +140,6 @@ public class ScreenTimeTracking extends Fragment{
 
     public static long getAppUsage(Context c,String appPackage){
         UsageStatsManager usageStatsManager = (UsageStatsManager) c.getSystemService(Context.USAGE_STATS_SERVICE);
-        long beginIntervalMillis = System.currentTimeMillis() - 1 * 24 * 60 * 60 * 1000;
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0);
         cal.set(Calendar.MINUTE, 0);
@@ -152,30 +149,38 @@ public class ScreenTimeTracking extends Fragment{
         return usageTimeMillis;
     }
 
-    private void setTableRows(List<String> packageList,TableLayout table) throws PackageManager.NameNotFoundException {
+    public static void setTableRows(List<String> packageList,TableLayout table,Context c,Boolean initLogo) throws PackageManager.NameNotFoundException {
+
+        table.removeAllViews();
 
         for(int i = 0; i < packageList.size(); i++){
-            TableRow tr = new TableRow(getActivity().getApplicationContext());
-            Drawable icon = getActivity().getApplicationContext().getPackageManager().getApplicationIcon(packageList.get(i));
-            ImageView imageView = new ImageView(getActivity().getApplicationContext());
-            imageView.setImageDrawable(icon);
-            tr.addView(imageView);
-            TextView t1 = new TextView(getActivity().getApplicationContext());
+            TableRow tr = new TableRow(c);
+            if(initLogo){
+                Drawable icon = c.getPackageManager().getApplicationIcon(packageList.get(i));
+                ImageView imageView = new ImageView(c);
+                imageView.setImageDrawable(icon);
+                tr.addView(imageView);
+            }
+            TextView t1 = new TextView(c);
             t1.setText(cutPackageName(packageList.get(i)));
             t1.setTextSize(15);
             t1.setPadding(50,100,0,0);
             tr.addView(t1);
 
-            TextView t2 = new TextView(getActivity().getApplicationContext());
-            int seconds = (int) (getAppUsage(getActivity().getApplicationContext(),packageList.get(i)) / 1000) % 60 ;
-            int minutes = (int) ((getAppUsage(getActivity().getApplicationContext(),packageList.get(i)) / (1000*60)) % 60);
-            int hours   = (int) ((getAppUsage(getActivity().getApplicationContext(),packageList.get(i)) / (1000*60*60)) % 24);
-            t2.setText(String.valueOf(hours) + ":" + String.valueOf(minutes) + ":" + String.valueOf(seconds));
+            TextView t2 = new TextView(c);
+            t2.setText(calcMillis(getAppUsage(c,packageList.get(i))));
             t2.setGravity(Gravity.RIGHT);
             tr.addView(t2);
             table.addView(tr);
         }
 
+    }
+
+    public static String calcMillis(Long millis){
+        int seconds = (int) (millis / 1000) % 60 ;
+        int minutes = (int) (millis / (1000*60)) % 60;
+        int hours   = (int) (millis / (1000*60*60)) % 24;
+        return hours + ":" +minutes + ":" + seconds;
     }
 
     public void getinstalledApps() throws PackageManager.NameNotFoundException {
