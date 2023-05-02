@@ -148,8 +148,6 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
             } else {
                 Toast.makeText(getActivity().getApplicationContext(), "Google Services not available", Toast.LENGTH_SHORT).show();
             }
-        }else{
-            startActivity(new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS));
         }
 
         viewLocationsInDB();
