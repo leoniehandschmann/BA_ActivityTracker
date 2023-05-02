@@ -1,9 +1,13 @@
 package com.example.activitytracker;
 
 
+import static android.content.Context.ALARM_SERVICE;
+
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -67,18 +71,27 @@ import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.TimeZone;
+import java.util.Timer;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 
 public class LocationTracking extends Fragment implements SensorEventListener, OnMapReadyCallback {
 
-    // to do: frage ob location wie lange da
-    // abstände zwischen locations beachten
-    // datenbank?
 
 
 
@@ -118,7 +131,11 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.location_tracking, container, false);
         location_db = new location_dbHelper(getActivity().getApplicationContext());
-        //db.deleteDataOlderThan24Hours();
+
+        //location_db.deleteDataOlderThan24Hours();
+
+
+
 
 
         viewDB = view.findViewById(R.id.viewDB);
@@ -142,7 +159,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
             if (checkGoogleServices()) {
                 mapView.getMapAsync(LocationTracking.this);
                 mapView.onCreate(savedInstanceState);
-                if (permissionGranted){
+                if (permissionGranted) {
                     checkGPS();
                 }
             } else {
@@ -152,8 +169,45 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
 
         viewLocationsInDB();
 
+        //getStayTime();
 
         return view;
+    }
+
+    private int getStayTime(){
+       int stayTime = 2;
+
+        Cursor c = location_db.getData();
+        ArrayList <String> locs = new ArrayList<String>();
+
+
+        if(c.moveToFirst()){
+            do{
+                try {
+                    locs.add(getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } while (c.moveToNext());
+        }
+
+        for (int i = 0; i < locs.size(); i++) {
+            for (int j = i + 1 ; j < locs.size(); j++) {
+                if (Objects.equals(locs.get(i), locs.get(j))) {
+                    stayTime = stayTime + 2;
+                    Log.d("seli",String.valueOf(stayTime) + " min at " + locs.get(i));
+                }else{
+                    stayTime = 2;
+                    Log.d("seli",String.valueOf(stayTime) + " min at " + locs.get(i));
+                }
+
+            }
+
+        }
+
+
+
+        return stayTime;
     }
 
     public static String getAddressFromLatLong(Double lat,Double lng,Context context) throws IOException {

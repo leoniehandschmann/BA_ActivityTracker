@@ -2,26 +2,20 @@ package com.example.activitytracker;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.annotation.StyleRes;
-import androidx.appcompat.app.AppCompatActivity;
 //import android.app.Fragment;
 import androidx.fragment.app.Fragment;
 
@@ -29,6 +23,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.zip.Inflater;
 
 public class Evaluation extends Fragment{
 
@@ -60,18 +55,10 @@ public class Evaluation extends Fragment{
 
         evaluation_db = new evaluation_dbHelper(getActivity().getApplicationContext());
 
-
-
         //init location evaluations
-        getLocationData();
-        if(locWODupli.size() != 0){
-            for (int i = 0; i < locWODupli.size(); i++) {
-                locationEvalView = inflater.inflate(R.layout.seekbar_template, null);
-                tv_loc = (TextView) locationEvalView.findViewById(R.id.activity_name);
-                tv_loc.setText(locWODupli.get(i));
-                mainLL.addView(locationEvalView);
-            }
-        }
+        initLocations(inflater);
+
+
 
         //init app usage screenTime evaluations
         initUsageRows(inflater);
@@ -81,6 +68,35 @@ public class Evaluation extends Fragment{
         submitAndSaveInDB();
 
         return parent;
+    }
+
+    private void initLocations(LayoutInflater infl) {
+        final Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    mainLL.removeView(locationEvalView);
+                    getLocationData();
+                    if(locWODupli.size() != 0){
+                        for (int i = 0; i < locWODupli.size(); i++) {
+                            locationEvalView = infl.inflate(R.layout.seekbar_template, null);
+                            tv_loc = (TextView) locationEvalView.findViewById(R.id.activity_name);
+                            tv_loc.setText(locWODupli.get(i));
+                            mainLL.addView(locationEvalView);
+                        }
+                    }
+
+                }
+                catch (Exception e) {
+                    Log.d("updateTV","not successful");
+                }
+                finally{
+                    handler.postDelayed(this, 30000);
+                }
+            }
+        };
+        handler.postDelayed(runnable, 30000);
     }
 
 

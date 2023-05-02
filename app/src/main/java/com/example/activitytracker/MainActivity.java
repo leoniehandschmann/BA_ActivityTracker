@@ -22,6 +22,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -44,10 +45,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
 
-        if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
-            MainActivity.this.startActivity(new Intent(Settings.ACTION_ALL_APPS_NOTIFICATION_SETTINGS));
+        /*if (ActivityCompat.checkSelfPermission(MainActivity.this, android.Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Bitte erlaube der App alle notwendigen Permissions.", Toast.LENGTH_SHORT).show();
+            MainActivity.this.startActivity(new Intent(Settings.ACTION_APPLICATION_SETTINGS));
             return;
-        }
+        }*/
         createNotificationChannel();
         initReminderNotification();
 
