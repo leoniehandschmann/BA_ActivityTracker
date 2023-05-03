@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentSender;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.hardware.Sensor;
@@ -90,12 +91,14 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 
-public class LocationTracking extends Fragment implements SensorEventListener, OnMapReadyCallback {
+public class LocationTracking extends Fragment implements OnMapReadyCallback {
 
 
 
 
     public TextView counter;
+    private double magnitudePrev = 0;
+    private Integer stepCount = 0;
     public Switch switchKM;
     public int currentSteps;
     public SensorManager sensorManager;
@@ -112,9 +115,7 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     public static String[] longitudeArray;
     public static String[] timestampsArray;
     public static String[] addressArray;
-
     public static Geocoder geocoder;
-
     public static List <Address> addresses;
 
 
@@ -134,16 +135,11 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
 
         //location_db.deleteDataOlderThan24Hours();
 
-
-
-
-
         viewDB = view.findViewById(R.id.viewDB);
 
         counter = view.findViewById(R.id.counter_view);
 
-
-        sensorManager = (SensorManager) getActivity().getApplicationContext().getSystemService(Context.SENSOR_SERVICE);
+        initStepCounter();
 
         switchKM = view.findViewById(R.id.switch_to_km);
         currentSteps = Integer.parseInt(counter.getText().toString());
@@ -172,6 +168,40 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
         //getStayTime();
 
         return view;
+    }
+
+    private void initStepCounter(){
+        SensorManager sensorManager = (SensorManager) getActivity().getApplicationContext().getSystemService(getContext().SENSOR_SERVICE);
+        Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+
+        SensorEventListener stepDetector = new SensorEventListener() {
+            @Override
+            public void onSensorChanged(SensorEvent event) {
+                if(event != null){
+                    float x_acceleration = event.values[0];
+                    float y_acceleration = event.values[1];
+                    float z_acceleration = event.values[2];
+
+                    double magnitude = Math.sqrt(x_acceleration * x_acceleration + y_acceleration * y_acceleration + z_acceleration * z_acceleration);
+                    double magnitudeDelta = magnitude - magnitudePrev;
+                    magnitudePrev = magnitude;
+
+                    if(magnitudeDelta > 6){
+                        stepCount++;
+                    }
+                    counter.setText(stepCount.toString());
+                }
+
+            }
+
+            @Override
+            public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+            }
+        };
+
+        sensorManager.registerListener(stepDetector,sensor,SensorManager.SENSOR_DELAY_NORMAL);
+
     }
 
     private int getStayTime(){
@@ -320,39 +350,33 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     }
 
     //step sensor funktionen
-    @Override
-    public void onResume() {
-        super.onResume();
-        //mapView.onResume();
 
-        running = true;
-        Sensor countStepsSensor = sensorManager.getDefaultSensor(Sensor.TYPE_STEP_COUNTER);
-        if (countStepsSensor != null) {
-            sensorManager.registerListener(this, countStepsSensor, SensorManager.SENSOR_DELAY_UI);
-        } else {
-            Toast.makeText(getActivity().getApplicationContext(), "Sensor not found!", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
     public void onPause() {
         super.onPause();
-        //mapView.onPause();
 
-        running = false;
-        sensorManager.unregisterListener(this);
+        SharedPreferences sharedPreferences = getActivity().getPreferences(getContext().MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.putInt("stepCount",stepCount);
+        editor.apply();
     }
 
-    @Override
-    public void onSensorChanged(SensorEvent event) {
-        if (running) {
-            counter.setText(String.valueOf(event.values[0]));
-        }
+    public void onStop() {
+        super.onStop();
+        mapView.onStop();
+
+        SharedPreferences sharedPreferences = getActivity().getPreferences(getContext().MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.clear();
+        editor.putInt("stepCount",stepCount);
+        editor.apply();
     }
 
-    @Override
-    public void onAccuracyChanged(Sensor sensor, int accuracy) {
+    public void onResume() {
+        super.onResume();
 
+        SharedPreferences sharedPreferences = getActivity().getPreferences(getContext().MODE_PRIVATE);
+        stepCount = sharedPreferences.getInt("stepCount",0);
     }
 
     //checkt location permission des users
@@ -562,12 +586,6 @@ public class LocationTracking extends Fragment implements SensorEventListener, O
     public void onStart() {
         super.onStart();
         mapView.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        mapView.onStop();
     }
 
     @Override
