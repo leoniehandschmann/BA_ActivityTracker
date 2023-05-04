@@ -97,8 +97,9 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
 
 
     public TextView counter;
+    public TextView counterKM;
     private double magnitudePrev = 0;
-    private Integer stepCount = 0;
+    public static Integer stepCount = 0;
     public Switch switchKM;
     public int currentSteps;
     public SensorManager sensorManager;
@@ -120,9 +121,6 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
 
 
 
-    //public Cursor cursor;
-
-
     public LocationTracking() {
         // Required empty public constructor
     }
@@ -138,12 +136,11 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         viewDB = view.findViewById(R.id.viewDB);
 
         counter = view.findViewById(R.id.counter_view);
+        counterKM = view.findViewById(R.id.counter_view2);
+        switchKM = view.findViewById(R.id.switch_to_km);
 
         initStepCounter();
-
-        switchKM = view.findViewById(R.id.switch_to_km);
-        currentSteps = Integer.parseInt(counter.getText().toString());
-        switcherChanged(currentSteps);
+        switcherChanged(stepCount);
 
         mapView = view.findViewById(R.id.mapView);
         checkPermission();
@@ -190,6 +187,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
                         stepCount++;
                     }
                     counter.setText(stepCount.toString());
+                    DataExport.stepsOverview.setText(stepCount.toString());
                 }
 
             }
@@ -341,9 +339,12 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 if (isChecked == true) {
-                    counter.setText(String.valueOf(counterToKM(steps)));
-                } else {
-                    counter.setText(String.valueOf(steps));
+                    counter.setVisibility(View.GONE);
+                    counterKM.setVisibility(View.VISIBLE);
+                    counterKM.setText(String.valueOf(counterToKM(stepCount)));
+                }else {
+                    counterKM.setVisibility(View.GONE);
+                    counter.setVisibility(View.VISIBLE);
                 }
             }
         });

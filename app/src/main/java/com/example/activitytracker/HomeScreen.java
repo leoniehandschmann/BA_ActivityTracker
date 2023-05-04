@@ -24,8 +24,11 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
+import java.util.Locale;
 import java.util.Set;
 
 public class HomeScreen extends Fragment {
@@ -86,30 +89,6 @@ public class HomeScreen extends Fragment {
         stepBarChart.getXAxis().setAxisMinimum(0);
     }
 
-    public static void getLocationsFromDBWODupli(Context context, ArrayList<String> locs, ArrayList<String>locsWODuplicates){
-        location_dbHelper db = new location_dbHelper(context);
-        Cursor c = db.getData();
-        locs = new ArrayList<String>();
-        locsWODuplicates = new ArrayList<String>();
-
-
-        if(c.moveToFirst()){
-            do{
-                try {
-                    locs.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), context));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } while (c.moveToNext());
-        }
-
-        Set<String> set = new HashSet<>();
-        for (String s : locs) {
-            if (set.add(s)) {
-                locsWODuplicates.add(s);
-            }
-        }
-    }
 
 
     private void initLocationListView(){
@@ -151,13 +130,37 @@ public class HomeScreen extends Fragment {
 
     private ArrayList<BarEntry> getBarData(){
         barDataList = new ArrayList<BarEntry>();
-        barDataList.add(new BarEntry(0.5f,10));
-        barDataList.add(new BarEntry(1.5f,20));
-        barDataList.add(new BarEntry(2.5f,30));
-        barDataList.add(new BarEntry(3.5f,40));
-        barDataList.add(new BarEntry(4.5f,50));
-        barDataList.add(new BarEntry(5.5f,60));
-        barDataList.add(new BarEntry(6.6f,70));
+
+        //check if db is empty
+        // if db is not empty use db data
+        // if db is empty check current date
+
+        steps_dbHelper stepDB = new steps_dbHelper(getActivity().getApplicationContext());
+        Cursor cursor = stepDB.getData();
+
+        if(stepDB == null){
+            Calendar c = Calendar.getInstance();
+            String dayToday = android.text.format.DateFormat.format("EEEE", c).toString();
+            if(dayToday == "Montag"){
+                barDataList.add(new BarEntry(0.5f,10));
+            }else if (dayToday == "Dienstag"){
+                barDataList.add(new BarEntry(1.5f,20));
+            } else if (dayToday == "Mittwoch"){
+                barDataList.add(new BarEntry(2.5f,30));
+            }else if (dayToday == "Donnerstag"){
+                barDataList.add(new BarEntry(3.5f,40));
+            }else if (dayToday == "Freitag"){
+                barDataList.add(new BarEntry(4.5f,50));
+            }else if (dayToday == "Samstag"){
+                barDataList.add(new BarEntry(5.5f,60));
+            }else if (dayToday == "Sonntag"){
+                barDataList.add(new BarEntry(6.6f,70));
+            }
+        }else if (stepDB != null){
+
+        }
+
+
         return barDataList;
     }
 
