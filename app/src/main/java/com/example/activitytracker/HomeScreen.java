@@ -3,7 +3,9 @@ package com.example.activitytracker;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,8 +27,12 @@ import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
@@ -38,8 +44,8 @@ public class HomeScreen extends Fragment {
     public static ArrayList<String> addressesList;
     public static ArrayAdapter <String> listViewAdapter;
     private BarChart stepBarChart;
-
-    ArrayList <BarEntry> barDataList;
+    public static ArrayList <BarEntry> barDataList;
+    private steps_dbHelper stepsDB;
 
     public HomeScreen() {
         // Required empty public constructor
@@ -50,8 +56,14 @@ public class HomeScreen extends Fragment {
         View view = inflater.inflate(R.layout.homescreen, container, false);
         locationList = view.findViewById(R.id.location_list);
         stepBarChart = view.findViewById(R.id.step_chart);
+        stepsDB = new steps_dbHelper(getActivity().getApplicationContext());
 
-        initStepBarChart();
+        if(stepsDB == null){
+            initStepBarChart(LocationTracking.barDataList);
+        }else{
+            initStepBarChart(getBarData());
+        }
+
         initLocationListView();
 
         return view;
@@ -59,9 +71,9 @@ public class HomeScreen extends Fragment {
 
 
 
-    private void initStepBarChart(){
+    private void initStepBarChart(ArrayList <BarEntry> data){
 
-        BarDataSet barDataSet = new BarDataSet(getBarData(),"Steps BarChart");
+        BarDataSet barDataSet = new BarDataSet(data,"Steps BarChart");
         BarData barData = new BarData();
         barData.addDataSet(barDataSet);
         stepBarChart.setData(barData);
@@ -130,36 +142,45 @@ public class HomeScreen extends Fragment {
 
     private ArrayList<BarEntry> getBarData(){
         barDataList = new ArrayList<BarEntry>();
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("dd.MMM.yyyy", Locale.getDefault());
+        String today = df.format(c.getTime());
 
-        //check if db is empty
-        // if db is not empty use db data
-        // if db is empty check current date
 
-        steps_dbHelper stepDB = new steps_dbHelper(getActivity().getApplicationContext());
-        Cursor cursor = stepDB.getData();
+        Cursor cursor = stepsDB.getData();
+        while(cursor.moveToNext()){
+            Integer valueFromDB = Integer.valueOf(cursor.getString(1));
+            String dateFromDB = cursor.getString(2);
 
-        if(stepDB == null){
-            Calendar c = Calendar.getInstance();
-            String dayToday = android.text.format.DateFormat.format("EEEE", c).toString();
-            if(dayToday == "Montag"){
-                barDataList.add(new BarEntry(0.5f,10));
-            }else if (dayToday == "Dienstag"){
-                barDataList.add(new BarEntry(1.5f,20));
-            } else if (dayToday == "Mittwoch"){
-                barDataList.add(new BarEntry(2.5f,30));
-            }else if (dayToday == "Donnerstag"){
-                barDataList.add(new BarEntry(3.5f,40));
-            }else if (dayToday == "Freitag"){
-                barDataList.add(new BarEntry(4.5f,50));
-            }else if (dayToday == "Samstag"){
-                barDataList.add(new BarEntry(5.5f,60));
-            }else if (dayToday == "Sonntag"){
-                barDataList.add(new BarEntry(6.6f,70));
+            //check if date in db is not older than 7 days
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                LocalDate from = LocalDate.parse(dateFromDB);
+                LocalDate to = LocalDate.parse(today);
+                if( ChronoUnit.DAYS.between(from,to) <= 7 ){
+                    String day = DateFormat.format("EEEE",Date.parse(dateFromDB)).toString();
+                    if(day == "Montag"){
+                        barDataList.add(new BarEntry(0.5f,valueFromDB));
+                    }else if (day == "Dienstag"){
+                        barDataList.add(new BarEntry(1.5f,valueFromDB));
+                    } else if (day == "Mittwoch"){
+                        barDataList.add(new BarEntry(2.5f,valueFromDB));
+                    }else if (day == "Donnerstag"){
+                        barDataList.add(new BarEntry(3.5f,valueFromDB));
+                        Log.d("leines", String.valueOf(valueFromDB));
+                    }else if (day == "Freitag"){
+                        barDataList.add(new BarEntry(4.5f,valueFromDB));
+                    }else if (day == "Samstag"){
+                        barDataList.add(new BarEntry(5.5f,valueFromDB));
+                    }else if (day == "Sonntag"){
+                        barDataList.add(new BarEntry(6.6f,valueFromDB));
+                    }
+                }
             }
-        }else if (stepDB != null){
+
+
+
 
         }
-
 
         return barDataList;
     }

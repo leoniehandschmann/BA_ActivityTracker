@@ -42,6 +42,7 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.github.mikephil.charting.data.BarEntry;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.ApiException;
@@ -118,6 +119,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     public static String[] addressArray;
     public static Geocoder geocoder;
     public static List <Address> addresses;
+    public static ArrayList <BarEntry> barDataList;
 
 
 
@@ -138,6 +140,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         counter = view.findViewById(R.id.counter_view);
         counterKM = view.findViewById(R.id.counter_view2);
         switchKM = view.findViewById(R.id.switch_to_km);
+        barDataList = new ArrayList<BarEntry>();
 
         initStepCounter();
         switcherChanged(stepCount);
@@ -188,6 +191,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
                     }
                     counter.setText(stepCount.toString());
                     DataExport.stepsOverview.setText(stepCount.toString());
+                    getBarDataWithEmptyDB();
                 }
 
             }
@@ -200,6 +204,27 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
 
         sensorManager.registerListener(stepDetector,sensor,SensorManager.SENSOR_DELAY_NORMAL);
 
+    }
+
+
+    private void getBarDataWithEmptyDB(){
+        Calendar c = Calendar.getInstance();
+        String dayToday = android.text.format.DateFormat.format("EEEE", c).toString();
+        if(dayToday == "Montag"){
+            barDataList.add(new BarEntry(0.5f,LocationTracking.stepCount));
+        }else if (dayToday == "Dienstag"){
+            barDataList.add(new BarEntry(1.5f,LocationTracking.stepCount));
+        } else if (dayToday == "Mittwoch"){
+            barDataList.add(new BarEntry(2.5f,LocationTracking.stepCount));
+        }else if (dayToday == "Donnerstag"){
+            barDataList.add(new BarEntry(3.5f,LocationTracking.stepCount));
+        }else if (dayToday == "Freitag"){
+            barDataList.add(new BarEntry(4.5f,LocationTracking.stepCount));
+        }else if (dayToday == "Samstag"){
+            barDataList.add(new BarEntry(5.5f,LocationTracking.stepCount));
+        }else if (dayToday == "Sonntag"){
+            barDataList.add(new BarEntry(6.6f,LocationTracking.stepCount));
+        }
     }
 
     private int getStayTime(){
