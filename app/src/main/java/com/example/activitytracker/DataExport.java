@@ -122,7 +122,7 @@ public class DataExport extends Fragment{
     private void saveStepsInDB(){
 
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("dd.MMM.yyyy", Locale.getDefault());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String formattedDate = df.format(c.getTime());
         //String dayToday = android.text.format.DateFormat.format("EEEE", c).toString();
         //String date = dayToday + " " + formattedDate;

@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -45,7 +47,16 @@ public class HomeScreen extends Fragment {
     public static ArrayAdapter <String> listViewAdapter;
     private BarChart stepBarChart;
     public static ArrayList <BarEntry> barDataList;
+    public static ArrayList <BarEntry> barDataList2;
     private steps_dbHelper stepsDB;
+    private ArrayList<Integer>mo;
+    private ArrayList<Integer>di;
+    private ArrayList<Integer>mi;
+    private ArrayList<Integer>don;
+    private ArrayList<Integer>fr;
+    private ArrayList<Integer>sa;
+    private ArrayList<Integer>so;
+
 
     public HomeScreen() {
         // Required empty public constructor
@@ -58,11 +69,31 @@ public class HomeScreen extends Fragment {
         stepBarChart = view.findViewById(R.id.step_chart);
         stepsDB = new steps_dbHelper(getActivity().getApplicationContext());
 
-        if(stepsDB == null){
-            initStepBarChart(LocationTracking.barDataList);
-        }else{
-            initStepBarChart(getBarData());
-        }
+        final Handler handler = new Handler();
+        Runnable runnable = new Runnable() {
+
+            @Override
+            public void run() {
+                try{
+                    if(stepsDB == null){
+                        initStepBarChart(getBarDataWithEmptyDB());
+                    }else{
+                        initDaysValues();
+                        initStepBarChart(getBarData());
+                    }
+                }
+                catch (Exception e) {
+                    Log.d("updateTV","not successful");
+                }
+                finally{
+                    handler.postDelayed(this, 30000);
+                }
+            }
+        };
+        handler.postDelayed(runnable, 30000);
+
+
+
 
         initLocationListView();
 
@@ -73,7 +104,7 @@ public class HomeScreen extends Fragment {
 
     private void initStepBarChart(ArrayList <BarEntry> data){
 
-        BarDataSet barDataSet = new BarDataSet(data,"Steps BarChart");
+        BarDataSet barDataSet = new BarDataSet(data,"");
         BarData barData = new BarData();
         barData.addDataSet(barDataSet);
         stepBarChart.setData(barData);
@@ -127,11 +158,6 @@ public class HomeScreen extends Fragment {
             }
         }
 
-        //getLocationsFromDBWODupli(getActivity().getApplicationContext(),addresses,addressesList);
-
-        /*location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
-        db.getDataWODuplicates(getActivity().getApplicationContext(),addresses,addressesList);*/
-
         listViewAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesList);
 
 
@@ -142,48 +168,201 @@ public class HomeScreen extends Fragment {
 
     private ArrayList<BarEntry> getBarData(){
         barDataList = new ArrayList<BarEntry>();
+
+        barDataList.add(new BarEntry(0.5f,mo.get(0)));
+        barDataList.add(new BarEntry(1.5f,di.get(0)));
+        barDataList.add(new BarEntry(2.5f,mi.get(0)));
+        barDataList.add(new BarEntry(3.5f,don.get(0)));
+        barDataList.add(new BarEntry(4.5f,fr.get(0)));
+        barDataList.add(new BarEntry(5.5f,sa.get(0)));
+        barDataList.add(new BarEntry(6.6f,so.get(0)));
+
+        Log.d("link", String.valueOf(barDataList));
+        return barDataList;
+    }
+
+    private void initDaysValues(){
+        mo = new ArrayList<Integer>();
+        di = new ArrayList<Integer>();
+        mi = new ArrayList<Integer>();
+        don = new ArrayList<Integer>();
+        fr = new ArrayList<Integer>();
+        sa = new ArrayList<Integer>();
+        so = new ArrayList<Integer>();
+
         Calendar c = Calendar.getInstance();
-        SimpleDateFormat df = new SimpleDateFormat("dd.MMM.yyyy", Locale.getDefault());
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String today = df.format(c.getTime());
 
 
         Cursor cursor = stepsDB.getData();
-        while(cursor.moveToNext()){
+        cursor.moveToFirst();
+        while(cursor.moveToNext()) {
+
             Integer valueFromDB = Integer.valueOf(cursor.getString(1));
             String dateFromDB = cursor.getString(2);
+
 
             //check if date in db is not older than 7 days
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 LocalDate from = LocalDate.parse(dateFromDB);
                 LocalDate to = LocalDate.parse(today);
-                if( ChronoUnit.DAYS.between(from,to) <= 7 ){
-                    String day = DateFormat.format("EEEE",Date.parse(dateFromDB)).toString();
-                    if(day == "Montag"){
-                        barDataList.add(new BarEntry(0.5f,valueFromDB));
-                    }else if (day == "Dienstag"){
-                        barDataList.add(new BarEntry(1.5f,valueFromDB));
-                    } else if (day == "Mittwoch"){
-                        barDataList.add(new BarEntry(2.5f,valueFromDB));
-                    }else if (day == "Donnerstag"){
-                        barDataList.add(new BarEntry(3.5f,valueFromDB));
-                        Log.d("leines", String.valueOf(valueFromDB));
-                    }else if (day == "Freitag"){
-                        barDataList.add(new BarEntry(4.5f,valueFromDB));
-                    }else if (day == "Samstag"){
-                        barDataList.add(new BarEntry(5.5f,valueFromDB));
-                    }else if (day == "Sonntag"){
-                        barDataList.add(new BarEntry(6.6f,valueFromDB));
+                if (ChronoUnit.DAYS.between(from, to) <= 7) {
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+                    try {
+                        Date date = format.parse(dateFromDB);
+                        Date tdy = format.parse(today);
+                        String day = DateFormat.format("EEEE", date).toString();
+                        String todayDay = DateFormat.format("EEEE", tdy).toString();
+
+                        if(day.equals("Montag")){
+                            if(day.equals(todayDay)){
+                                mo.add(LocationTracking.stepCount);
+                            }else{
+                                mo.add(valueFromDB);
+                            }
+                        }else if (day.equals("Dienstag")){
+                            if(day.equals(todayDay)){
+                                di.add(LocationTracking.stepCount);
+                            }else{
+                                di.add(valueFromDB);
+                            }
+                        } else if (day.equals("Mittwoch")){
+                            if(day.equals(todayDay)){
+                                mi.add(LocationTracking.stepCount);
+                            }else{
+                                mi.add(valueFromDB);
+                            }
+                        }else if (day.equals("Donnerstag")){
+                            if(day.equals(todayDay)){
+                                don.add(LocationTracking.stepCount);
+                            }else{
+                                don.add(valueFromDB);
+                            }
+                        }else if (day.equals("Freitag")){
+                            if(day.equals(todayDay)){
+                                fr.add(LocationTracking.stepCount);
+                            }else{
+                                fr.add(valueFromDB);
+                            }
+                        }else if (day.equals("Samstag")){
+                            if(day.equals(todayDay)){
+                                sa.add(LocationTracking.stepCount);
+                            }else{
+                                sa.add(valueFromDB);
+                            }
+                        }else if (day.equals("Sonntag")){
+                            if(day.equals(todayDay)){
+                                so.add(LocationTracking.stepCount);
+                            }else{
+                                so.add(valueFromDB);
+                            }
+                        }
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
                 }
             }
-
-
-
-
         }
 
-        return barDataList;
+        if(mo.isEmpty()){
+            mo.add(0);
+        }
+        if(di.isEmpty()){
+            di.add(0);
+        }
+        if(mi.isEmpty()){
+            mi.add(0);
+        }
+        if(don.isEmpty()){
+            don.add(0);
+        }
+        if(fr.isEmpty()){
+            fr.add(0);
+        }
+        if(sa.isEmpty()){
+            sa.add(0);
+        }
+        if(so.isEmpty()){
+            so.add(0);
+        }
+
     }
+
+    public static ArrayList<BarEntry> getBarDataWithEmptyDB(){
+        barDataList2 = new ArrayList<BarEntry>();
+        Calendar c = Calendar.getInstance();
+        String dayToday = android.text.format.DateFormat.format("EEEE", c).toString();
+        Log.d("link",dayToday);
+        if(dayToday.equals("Montag")){
+            Log.d("link","i am in loop");
+            barDataList2.add(new BarEntry(0.5f,LocationTracking.stepCount));
+            barDataList2.add(new BarEntry(1.5f,0));
+            barDataList2.add(new BarEntry(2.5f,0));
+            barDataList2.add(new BarEntry(3.5f,0));
+            barDataList2.add(new BarEntry(4.5f,0));
+            barDataList2.add(new BarEntry(5.5f,0));
+            barDataList2.add(new BarEntry(6.6f,0));
+        }
+        if (dayToday.equals("Dienstag")){
+            barDataList2.add(new BarEntry(0.5f,0));
+            barDataList2.add(new BarEntry(1.5f,LocationTracking.stepCount));
+            barDataList2.add(new BarEntry(2.5f,0));
+            barDataList2.add(new BarEntry(3.5f,0));
+            barDataList2.add(new BarEntry(4.5f,0));
+            barDataList2.add(new BarEntry(5.5f,0));
+            barDataList2.add(new BarEntry(6.6f,0));
+
+        }
+        if (dayToday.equals("Mittwoch")){
+            barDataList2.add(new BarEntry(0.5f,0));
+            barDataList2.add(new BarEntry(1.5f,0));
+            barDataList2.add(new BarEntry(2.5f,LocationTracking.stepCount));
+            barDataList2.add(new BarEntry(3.5f,0));
+            barDataList2.add(new BarEntry(4.5f,0));
+            barDataList2.add(new BarEntry(5.5f,0));
+            barDataList2.add(new BarEntry(6.6f,0));
+        }
+        if (dayToday.equals("Donnerstag")){
+            barDataList2.add(new BarEntry(0.5f,0));
+            barDataList2.add(new BarEntry(1.5f,0));
+            barDataList2.add(new BarEntry(2.5f,0));
+            barDataList2.add(new BarEntry(3.5f,LocationTracking.stepCount));
+            barDataList2.add(new BarEntry(4.5f,0));
+            barDataList2.add(new BarEntry(5.5f,0));
+            barDataList2.add(new BarEntry(6.6f,0));
+        }
+        if (dayToday.equals("Freitag")){
+            barDataList2.add(new BarEntry(0.5f,0));
+            barDataList2.add(new BarEntry(1.5f,0));
+            barDataList2.add(new BarEntry(2.5f,0));
+            barDataList2.add(new BarEntry(3.5f,0));
+            barDataList2.add(new BarEntry(4.5f,LocationTracking.stepCount));
+            barDataList2.add(new BarEntry(5.5f,0));
+            barDataList2.add(new BarEntry(6.6f,0));
+        }
+        if (dayToday.equals("Samstag")){
+            barDataList2.add(new BarEntry(0.5f,0));
+            barDataList2.add(new BarEntry(1.5f,0));
+            barDataList2.add(new BarEntry(2.5f,0));
+            barDataList2.add(new BarEntry(3.5f,0));
+            barDataList2.add(new BarEntry(4.5f,0));
+            barDataList2.add(new BarEntry(5.5f,LocationTracking.stepCount));
+            barDataList2.add(new BarEntry(6.6f,0));
+        }
+        if (dayToday.equals("Sonntag")){
+            barDataList2.add(new BarEntry(0.5f,0));
+            barDataList2.add(new BarEntry(1.5f,0));
+            barDataList2.add(new BarEntry(2.5f,0));
+            barDataList2.add(new BarEntry(3.5f,0));
+            barDataList2.add(new BarEntry(4.5f,0));
+            barDataList2.add(new BarEntry(5.5f,0));
+            barDataList2.add(new BarEntry(6.6f,LocationTracking.stepCount));
+        }
+
+        return barDataList2;
+    }
+
 
 
 
