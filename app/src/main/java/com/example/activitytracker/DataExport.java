@@ -67,6 +67,7 @@ public class DataExport extends Fragment{
         return view;
     }
 
+    //init overview of chosen work and life apps and usageTime --> update every 30 sec
     private void initScreenTimeOverview(){
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
@@ -78,7 +79,7 @@ public class DataExport extends Fragment{
                     ScreenTimeTracking.setTableRows(ScreenTimeTracking.selectedPackages_Work,table_work,getActivity().getApplicationContext(),true);
                 }
                 catch (Exception e) {
-                    Log.d("updateTV","not successful");
+                    Log.d("updateTV",getString(R.string.log_no_success));
                 }
                 finally{
                     handler.postDelayed(this, 30000);
@@ -88,6 +89,7 @@ public class DataExport extends Fragment{
         handler.postDelayed(runnable, 30000);
     }
 
+    //on export btn click current app usage times and current steps saved in DBs
     private void saveDataBtnClick(){
         exportBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -99,6 +101,7 @@ public class DataExport extends Fragment{
 
     }
 
+    //method for saving usage time of each chosen app
     private void saveScreenTimeInDB(){
         for(int i=0; i <ScreenTimeTracking.selectedPackages_Life.size();i++){
             Boolean checkInsert = screenTime_db.insertData("life",ScreenTimeTracking.selectedPackages_Life.get(i),ScreenTimeTracking.getAppUsage(getActivity().getApplicationContext(),ScreenTimeTracking.selectedPackages_Life.get(i)));
@@ -112,31 +115,30 @@ public class DataExport extends Fragment{
         for(int i=0; i <ScreenTimeTracking.selectedPackages_Work.size();i++){
             Boolean checkInsert = screenTime_db.insertData("work",ScreenTimeTracking.selectedPackages_Work.get(i),ScreenTimeTracking.getAppUsage(getActivity().getApplicationContext(),ScreenTimeTracking.selectedPackages_Work.get(i)));
             if(checkInsert==true){
-                Toast.makeText(getActivity().getApplicationContext(), "new ScreenTime work inserted in DB", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.screentime_db_success), Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(getActivity().getApplicationContext(), "nothing inserted in DB", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    //method for saving steps in DB
     private void saveStepsInDB(){
 
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String formattedDate = df.format(c.getTime());
-        //String dayToday = android.text.format.DateFormat.format("EEEE", c).toString();
-        //String date = dayToday + " " + formattedDate;
 
         Boolean checkInsert = steps_db.insertData(LocationTracking.stepCount,formattedDate);
         if(checkInsert==true){
-            Toast.makeText(getActivity().getApplicationContext(), "new steps inserted in DB", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.steps_db_success), Toast.LENGTH_SHORT).show();
         }else{
-            Toast.makeText(getActivity().getApplicationContext(), "nothing inserted in DB", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
         }
     }
 
 
-
+    //init Overview of all visited Locations
     private void initLocationOverview(){
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();

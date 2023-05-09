@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
+    //create Notification at 8pm
     private void initReminderNotification() {
         Intent intent = new Intent(MainActivity.this,NotificationReceiver.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(MainActivity.this,0,intent,PendingIntent.FLAG_IMMUTABLE);
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    //Navigationbar selected Listener
     private final BottomNavigationView.OnItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnItemSelectedListener() {
 
@@ -118,14 +119,13 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+    //create NotificationChannel
     private void createNotificationChannel(){
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            CharSequence name = "AtivoReminderChannel";
-            String description = "Channel for Data Export Reminder";
             int importance = NotificationManager.IMPORTANCE_HIGH;
             NotificationChannel notificationChannel = null;
-            notificationChannel = new NotificationChannel("notifyDataExport",name,importance);
-            notificationChannel.setDescription(description);
+            notificationChannel = new NotificationChannel("notifyDataExport",getString(R.string.notification_channel_name),importance);
+            notificationChannel.setDescription(getString(R.string.notification_channel_descript));
 
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(notificationChannel);

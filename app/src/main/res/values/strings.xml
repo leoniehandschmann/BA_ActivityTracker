@@ -1,6 +1,15 @@
 <resources>
-    <string name="app_name">Activitytracker</string>
+    <string name="app_name">Ativo - Activitytracker</string>
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="maps_api_key">AIzaSyBg_QkHpW_S-2NFTM8sBWlwe6hz0exwJr8</string>
+    <string name="log_no_success">not successful</string>
+    <string name="eval_db_success">Evaluation wurde gespeichert</string>
+    <string name="loc_db_success">Location wurde gespeichert</string>
+    <string name="steps_db_success">Schrittanzahl wurde gespeichert</string>
+    <string name="screentime_db_success">Screentime wurde gespeichert</string>
+    <string name="db_no_success">Es konnte leider nichts gespeichert werden. Versuche es später erneut</string>
+    <string name="notification_channel_name">AtivoReminderChannel</string>
+    <string name="notification_channel_descript">Channel for Data Export Reminder</string>
+    <string name="notification_title">Erinnerung zum Daten Export</string>
+    <string name="notification_text">Hast du deine Daten heute schon bewertet und exportiert?</string>
 </resources>

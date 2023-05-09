@@ -95,16 +95,11 @@ import java.util.concurrent.TimeUnit;
 public class LocationTracking extends Fragment implements OnMapReadyCallback {
 
 
-
-
     public TextView counter;
     public TextView counterKM;
     private double magnitudePrev = 0;
     public static Integer stepCount = 0;
     public Switch switchKM;
-    public int currentSteps;
-    public SensorManager sensorManager;
-    public boolean running = false;
     public boolean permissionGranted;
     public MapView mapView;
     public GoogleMap googleMap;
@@ -113,18 +108,12 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     public Location currentLocation;
     public static location_dbHelper location_db;
     public Button viewDB;
-    public static String[] latitudeArray;
-    public static String[] longitudeArray;
-    public static String[] timestampsArray;
-    public static String[] addressArray;
     public static Geocoder geocoder;
     public static List <Address> addresses;
-    public static ArrayList <BarEntry> barDataList2;
 
 
 
     public LocationTracking() {
-        // Required empty public constructor
     }
 
     @Nullable
@@ -170,6 +159,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+    //init step sensor and counter
     private void initStepCounter(){
         SensorManager sensorManager = (SensorManager) getActivity().getApplicationContext().getSystemService(getContext().SENSOR_SERVICE);
         Sensor sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -206,8 +196,6 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     }
 
 
-
-
     private int getStayTime(){
        int stayTime = 2;
 
@@ -238,54 +226,41 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
             }
 
         }
-
-
-
         return stayTime;
     }
 
+    //get address from Lat and Long Coordinates
     public static String getAddressFromLatLong(Double lat,Double lng,Context context) throws IOException {
-
         geocoder = new Geocoder(context, Locale.getDefault());
         addresses = geocoder.getFromLocation(lat, lng, 1);
         String address = addresses.get(0).getAddressLine(0);
-        /*String knownName = addresses.get(0).getLocality();
-        if(knownName != null){
-            return knownName + "\n" + address;
-        }else{
-            return address;
-        }*/
         return address;
-
     }
 
+    //transfer millis in date to real time
     public static String realTime(Date d)
     {
         SimpleDateFormat sdf = new SimpleDateFormat("kk:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         String result = sdf.format(d);
-        Log.d("realTime", result);
         return result;
     }
 
 
+    //transfer millis in date to real date
     public static String realDate(Date d)
     {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
         sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         String result = sdf.format(d);
-        Log.d("realDate", result);
         return result;
     }
 
-    //nur zum testen was in db ist???
-
+    //View locations button
     private void viewLocationsInDB(){
         viewDB.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                //Cursor res = db.getReadableDatabase().rawQuery("Select * from LocationDetails", null);
-                //res.moveToFirst();
                 Cursor cursor = location_db.getData();
                 if(cursor.getCount()==0){
                     Toast.makeText(getActivity().getApplicationContext(), "empty DB", Toast.LENGTH_SHORT).show();
@@ -308,38 +283,14 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    public static void getDataFromDBInArrays(Context context){
-        Cursor c = location_db.getData();
-        latitudeArray =new String[c.getCount()];
-        longitudeArray =new String[c.getCount()];
-        timestampsArray = new String[c.getCount()];
-        addressArray = new String[c.getCount()];
 
-        while(c.moveToNext()){
-            for (int i = 0; i < c.getCount(); i++) {
-                latitudeArray[i] = c.getString(1);
-                longitudeArray[i] = c.getString(2);
-                timestampsArray[i] = c.getString(3);
-                try {
-                    addressArray[i] = getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)),context);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-
-    }
-
-
-
-
-
-    //switcher von steps zu km
+    //steps to km
     private float counterToKM(int steps) {
         float stepsKM = (float) steps / 1400;
         return (float) (Math.round(stepsKM * 100) / 100.);
     }
 
+    //switcher listener for changing steps to km
     private void switcherChanged(int steps) {
         switchKM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -356,8 +307,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         });
     }
 
-    //step sensor funktionen
-
+    //step sensor functions
     public void onPause() {
         super.onPause();
 
@@ -386,7 +336,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         stepCount = sharedPreferences.getInt("stepCount",0);
     }
 
-    //checkt location permission des users
+    //check location permission
     private void checkPermission() {
         Dexter.withContext(getActivity().getApplicationContext()).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
             @Override
@@ -411,7 +361,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         }).check();
     }
 
-    //checkt ob google services verfügbar
+    //check google services
     private boolean checkGoogleServices() {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int result = apiAvailability.isGooglePlayServicesAvailable(getActivity().getApplicationContext());
@@ -431,7 +381,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     }
 
 
-    //checkt ob gps am smartphone aktiviert ist
+    //check if gps on smartphone is available + send location request every 2 min
     private void checkGPS() {
         locationRequest = LocationRequest.create();
         locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -441,7 +391,6 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         //alle 30 min --> 1.800.000 oder 60*30.000 millisec
         locationRequest.setInterval(60*30000);
         locationRequest.setFastestInterval(60*2000);
-
 
         LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder().addLocationRequest(locationRequest).setAlwaysShow(true);
 
@@ -473,7 +422,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     }
 
 
-    //getcurrentLocation --> update db
+    //save current location in db + add polyline to maps + update Location Lists in other Fragments
     private void getCurrentLocationUpdate() {
         locationProviderClient = LocationServices.getFusedLocationProviderClient(getActivity());
         if (ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity().getApplicationContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -488,36 +437,28 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
                 String currentTime = realTime(date);
                 String currentDate = realDate(date);
                 String timestamp = currentTime + " " + currentDate;
-                Log.d("locTrack","Location: "+ currentLocation.getLatitude() +": "+ currentLocation.getLongitude());
+
                 Boolean checkInsert = location_db.insertData(currentLocation.getLatitude(),currentLocation.getLongitude(), timestamp);
-                getDataFromDBInArrays(getActivity().getApplicationContext());
+                //getDataFromDBInArrays(getActivity().getApplicationContext());
 
 
+                //add polyline from db locations to map
                 PolylineOptions options = new PolylineOptions();
                 options.color(0xffff0000);
                 options.width(5);
-
-
                 Cursor cur = location_db.getData();
                 while(cur.moveToNext()){
                     LatLng location = new LatLng(Double.parseDouble(cur.getString(1)), Double.parseDouble(cur.getString(2)));
                     options.add(location);
                 }
-
                 googleMap.addPolyline(options);
-
-                Log.d("insertDB",checkInsert.toString());
-                Log.d("insertDB", currentLocation.getLatitude() + " " + currentLocation.getLongitude() + " " +timestamp);
-
 
 
                 if(checkInsert==true){
-                    Toast.makeText(getActivity().getApplicationContext(), "new Location inserted in DB", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getApplicationContext(), getString(R.string.loc_db_success), Toast.LENGTH_SHORT).show();
                 }else{
-                    Toast.makeText(getActivity().getApplicationContext(), "no Location inserted in DB", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
                 }
-                //Toast.makeText(getActivity().getApplicationContext(), "Location:"+locationResult.getLastLocation().getLongitude()+": "+locationResult.getLastLocation().getLatitude(), Toast.LENGTH_SHORT).show();
-
                 try {
                     updateLocationListView(currentLocation,getActivity().getApplicationContext());
                 } catch (IOException e) {
@@ -530,7 +471,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     }
 
 
-    //update listview on homescreen --> dont add duplicates
+    //update listview on homescreen and data export --> dont add duplicates to list
     public static void updateLocationListView(Location loc,Context context) throws IOException {
         String checkLoc = getAddressFromLatLong(loc.getLatitude(), loc.getLongitude(), context);
         if(!HomeScreen.addressesList.contains(checkLoc)) {
@@ -552,24 +493,10 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
 
 
 
-
-
-    //google map funktion --> init map
+    //init google map
     @Override
     public void onMapReady(@NonNull GoogleMap map) {
-        //init map with zoom,compass etc.
-
         googleMap = map;
-        LatLng latLng = new LatLng(49.015143, 12.101756);
-        //LatLng latLng = new LatLng(googleMap.getMyLocation().getLatitude(), googleMap.getMyLocation().getLongitude());
-        /*MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.title("Current position");
-        markerOptions.position(latLng);
-        googleMap.addMarker(markerOptions);*/
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 10);
-        googleMap.animateCamera(cameraUpdate);
-
-
 
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setCompassEnabled(true);
@@ -579,16 +506,11 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         }
         googleMap.setMyLocationEnabled(true);
 
-
-
-
     }
 
 
 
-
-
-    //maps funktionen die evtl gar nicht nötig sind?
+   //required maps functions
     @Override
     public void onStart() {
         super.onStart();

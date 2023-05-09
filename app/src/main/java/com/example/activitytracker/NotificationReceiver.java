@@ -16,8 +16,8 @@ public class NotificationReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, "notifyDataExport")
                 .setSmallIcon(R.drawable.ic_launcher_foreground)
-                .setContentTitle("Erinnerung zum Daten Export")
-                .setContentTitle("Hast du deine Daten heute schon bewertet und exportiert?")
+                .setContentTitle(context.getString(R.string.notification_title))
+                .setContentTitle(context.getString(R.string.notification_text))
                 .setPriority(NotificationCompat.PRIORITY_HIGH);
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);

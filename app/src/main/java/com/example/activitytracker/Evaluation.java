@@ -51,18 +51,15 @@ public class Evaluation extends Fragment{
         }
         parent = (LinearLayout) inflater.inflate(R.layout.activity_evaluation, null);
         mainLL = parent.findViewById(R.id.main_eval_layout);
-
-
         evaluation_db = new evaluation_dbHelper(getActivity().getApplicationContext());
 
         //init location evaluations
         initLocations(inflater);
 
-
-
         //init app usage screenTime evaluations
         initUsageRows(inflater);
 
+        //init all Buttons
         initDeleteBtn();
         initBtn();
         submitAndSaveInDB();
@@ -70,6 +67,7 @@ public class Evaluation extends Fragment{
         return parent;
     }
 
+    //load every 30 sec locations from db for evaluation in view(with template)
     private void initLocations(LayoutInflater infl) {
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
@@ -89,7 +87,7 @@ public class Evaluation extends Fragment{
 
                 }
                 catch (Exception e) {
-                    Log.d("updateTV","not successful");
+                    Log.d("updateTV", getString(R.string.log_no_success));
                 }
                 finally{
                     handler.postDelayed(this, 30000);
@@ -100,6 +98,7 @@ public class Evaluation extends Fragment{
     }
 
 
+    //load every 30 sec chosen Apps with UsageTime for evaluation in view (with template)
     private void initUsageRows(LayoutInflater inflater){
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
@@ -135,7 +134,7 @@ public class Evaluation extends Fragment{
 
                 }
                 catch (Exception e) {
-                    Log.d("updateTV","not successful");
+                    Log.d("updateTV",getString(R.string.log_no_success));
                 }
                 finally{
                     handler.postDelayed(this, 30000);
@@ -146,6 +145,7 @@ public class Evaluation extends Fragment{
     }
 
 
+    // init submit button
     private void initBtn(){
         submit_btn = new Button(getActivity().getApplicationContext());
         submit_btn.setText("Submit");
@@ -157,6 +157,7 @@ public class Evaluation extends Fragment{
 
     }
 
+    // init delete trash cans --> if location or app is redundant for user it is possible to delete from evaluation
     private void initDeleteBtn(){
 
         //activity evaluation layout
@@ -194,6 +195,7 @@ public class Evaluation extends Fragment{
     }
 
 
+    //get location data from LocationDB --> without duplicate Locations
     private void getLocationData(){
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
@@ -220,6 +222,7 @@ public class Evaluation extends Fragment{
     }
 
 
+    // transfer value of scrollbar in wanted evaluation value --> evaluate from -3 to +3
     private int getRealVal(int val){
         if(val == 0){
             val = -3;
@@ -239,6 +242,8 @@ public class Evaluation extends Fragment{
         return val;
     }
 
+
+    // click Listener for submit btn --> save evaluation in DB
     private void submitAndSaveInDB(){
         submit_btn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,14 +259,12 @@ public class Evaluation extends Fragment{
                             if(view2 instanceof SeekBar){
                                 evaluationVal = ((SeekBar) view2).getProgress();
                                 evaluationVal = getRealVal(evaluationVal);
-                                Log.d("handsch", String.valueOf(evaluationVal));
                             }else if(view2.getId() == R.id.activity_name_layout){
                                 LinearLayout ll2 = (LinearLayout) view2;
                                 for(int k=0;k<ll2.getChildCount();k++){
                                     View view3 = ll2.getChildAt(k);
                                     if(view3 instanceof TextView){
                                         activityName = (String) ((TextView) view3).getText();
-                                        Log.d("handsch", activityName);
                                     }
                                 }
 
@@ -270,9 +273,9 @@ public class Evaluation extends Fragment{
 
                         Boolean checkInsert = evaluation_db.insertData(activityName,evaluationVal);
                         if(checkInsert==true){
-                            Toast.makeText(getActivity().getApplicationContext(), "new Evaluation inserted in DB", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.eval_db_success), Toast.LENGTH_SHORT).show();
                         }else{
-                            Toast.makeText(getActivity().getApplicationContext(), "nothing inserted in DB", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
                         }
                     }
 

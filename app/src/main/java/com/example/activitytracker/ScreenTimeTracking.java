@@ -42,7 +42,6 @@ public class ScreenTimeTracking extends Fragment{
 
     private TextView tv_choose_life_apps;
     private TextView tv_choose_work_apps;
-
     private TableLayout appTable_Life;
     private TableLayout appTable_Work;
     private List<String> appsPackList;
@@ -50,7 +49,6 @@ public class ScreenTimeTracking extends Fragment{
     private ArrayList<Integer> selectedAppsList_Life;
     public static List<String> selectedPackages_Life;
     private boolean[] selectedApps_Life;
-
     private ArrayList<Integer> selectedAppsList_Work;
     public static List<String> selectedPackages_Work;
     private boolean[] selectedApps_Work;
@@ -64,6 +62,24 @@ public class ScreenTimeTracking extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.screentime_tracking, container, false);
+        init(view);
+        checkPermission();
+
+        try {
+            getinstalledApps();
+        } catch (PackageManager.NameNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        initAppChooser(tv_choose_life_apps,selectedApps_Life,selectedAppsList_Life,selectedPackages_Life);
+
+        initAppChooser(tv_choose_work_apps,selectedApps_Work,selectedAppsList_Work,selectedPackages_Work);
+
+        return view;
+    }
+
+    //init all views and lists
+    private void init(View view){
         tv_choose_life_apps = view.findViewById(R.id.choose_life);
         tv_choose_work_apps = view.findViewById(R.id.choose_work);
         appTable_Life = view.findViewById(R.id.app_table_life);
@@ -74,30 +90,18 @@ public class ScreenTimeTracking extends Fragment{
         selectedPackages_Life = new ArrayList<>();
         selectedAppsList_Work = new ArrayList<>();
         selectedPackages_Work = new ArrayList<>();
-
         screenTime_db = new screenTime_dbHelper(getActivity().getApplicationContext());
-
-        try {
-            getinstalledApps();
-        } catch (PackageManager.NameNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
         selectedApps_Life = new boolean[appsPackList.size()];
-        initAppChooser(tv_choose_life_apps,selectedApps_Life,selectedAppsList_Life,selectedPackages_Life);
-
         selectedApps_Work = new boolean[appsPackList.size()];
-        initAppChooser(tv_choose_work_apps,selectedApps_Work,selectedAppsList_Work,selectedPackages_Work);
+    }
 
+    //check permission for app usage time
+    private void checkPermission(){
         if(checkUsagePermission(getActivity().getApplicationContext())){
             updateAppUsage();
         }else{
             startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
         }
-
-        Log.d("diego", String.valueOf(appsPackList));
-
-        return view;
     }
 
     private boolean checkUsagePermission(Context c){
@@ -109,6 +113,7 @@ public class ScreenTimeTracking extends Fragment{
     }
 
 
+    //check app usage time every 30 sec and update listviews
     private void updateAppUsage() {
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
@@ -120,7 +125,7 @@ public class ScreenTimeTracking extends Fragment{
                     setTableRows(selectedPackages_Work,appTable_Work,getActivity().getApplicationContext(),true);
                 }
                 catch (Exception e) {
-                    Log.d("updateTV","not successful");
+                    Log.d("updateTV",getString(R.string.log_no_success));
                 }
                 finally{
                     handler.postDelayed(this, 30000);
@@ -131,6 +136,7 @@ public class ScreenTimeTracking extends Fragment{
 
     }
 
+    //get app usage time and format
     public static long getAppUsage(Context c,String appPackage){
         UsageStatsManager usageStatsManager = (UsageStatsManager) c.getSystemService(Context.USAGE_STATS_SERVICE);
         Calendar cal = Calendar.getInstance();
@@ -142,6 +148,7 @@ public class ScreenTimeTracking extends Fragment{
         return usageTimeMillis;
     }
 
+    //set table layout rows
     public static void setTableRows(List<String> packageList,TableLayout table,Context c,Boolean initLogo) throws PackageManager.NameNotFoundException {
 
         table.removeAllViews();
@@ -169,6 +176,7 @@ public class ScreenTimeTracking extends Fragment{
 
     }
 
+    //transfer millis
     public static String calcMillis(Long millis){
         int seconds = (int) (millis / 1000) % 60 ;
         int minutes = (int) (millis / (1000*60)) % 60;
@@ -176,22 +184,19 @@ public class ScreenTimeTracking extends Fragment{
         return hours + ":" +minutes + ":" + seconds;
     }
 
+    //get all installed apps on smartphone
     public void getinstalledApps() throws PackageManager.NameNotFoundException {
 
         PackageManager pm = getActivity().getApplicationContext().getPackageManager();
         List<ApplicationInfo> apps = pm.getInstalledApplications(PackageManager.GET_GIDS);
-
-
 
         for (ApplicationInfo app : apps) {
             if(pm.getLaunchIntentForPackage(app.packageName) != null) {
                 // apps with launcher intent
                 if((app.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
                 // updated system apps
-                Log.d("appnam","updated system: " + app.packageName);
                 } else if ((app.flags & ApplicationInfo.FLAG_SYSTEM) != 0) {
                     // system apps
-                    Log.d("appnam","system: " + app.packageName);
                     appsPackList.add(app.packageName);
                     Drawable dr = pm.getApplicationIcon(app.packageName);
                     Bitmap bitmap = getBitmapFromDrawable(dr);
@@ -199,7 +204,6 @@ public class ScreenTimeTracking extends Fragment{
                     appsIconsList.add(d);
                 } else {
                     // user installed apps
-                    Log.d("appnam","user installed: " + app.packageName);
                     appsPackList.add(app.packageName);
                     Drawable dr = pm.getApplicationIcon(app.packageName);
                     Bitmap bitmap = getBitmapFromDrawable(dr);
@@ -208,11 +212,11 @@ public class ScreenTimeTracking extends Fragment{
                 }
             }
         }
-        Log.d("pooh", String.valueOf(appsPackList));
 
     }
 
 
+    //get app icon
     private Bitmap getBitmapFromDrawable(@NonNull Drawable drawable) {
         final Bitmap bmp = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         final Canvas canvas = new Canvas(bmp);
@@ -221,7 +225,7 @@ public class ScreenTimeTracking extends Fragment{
         return bmp;
     }
 
-
+    //cut package name of app to just app name
     public static String cutPackageName(String packName){
         if (packName.contains("com.google.android.apps.")) {
             return packName.substring(24);
@@ -243,6 +247,7 @@ public class ScreenTimeTracking extends Fragment{
         return packName;
     }
 
+    //init chooser for work and life apps
     private void initAppChooser(TextView tv,boolean[]selectedApps,ArrayList<Integer> selectedAppsList,List<String> selectedPackages){
         String [] allAppNames = new String[appsPackList.size()];
         for(int i = 0; i < allAppNames.length; i++){
