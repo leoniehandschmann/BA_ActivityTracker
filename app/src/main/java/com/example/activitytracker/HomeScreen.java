@@ -181,7 +181,7 @@ public class HomeScreen extends Fragment {
         return barDataList;
     }
 
-    private void initDaysValues(){
+    private void initDaysValues() throws ParseException {
         mo = new ArrayList<Integer>();
         di = new ArrayList<Integer>();
         mi = new ArrayList<Integer>();
@@ -193,6 +193,9 @@ public class HomeScreen extends Fragment {
         Calendar c = Calendar.getInstance();
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         String today = df.format(c.getTime());
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        Date tdy = format.parse(today);
+        String todayDay = DateFormat.format("EEEE", tdy).toString();
 
 
         Cursor cursor = stepsDB.getData();
@@ -208,12 +211,9 @@ public class HomeScreen extends Fragment {
                 LocalDate from = LocalDate.parse(dateFromDB);
                 LocalDate to = LocalDate.parse(today);
                 if (ChronoUnit.DAYS.between(from, to) <= 7) {
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
                     try {
                         Date date = format.parse(dateFromDB);
-                        Date tdy = format.parse(today);
                         String day = DateFormat.format("EEEE", date).toString();
-                        String todayDay = DateFormat.format("EEEE", tdy).toString();
 
                         if(day.equals("Montag")){
                             if(day.equals(todayDay)){
@@ -266,25 +266,53 @@ public class HomeScreen extends Fragment {
         }
 
         if(mo.isEmpty()){
-            mo.add(0);
+            if(todayDay.equals("Montag")){
+                mo.add(LocationTracking.stepCount);
+            }else{
+                mo.add(0);
+            }
         }
         if(di.isEmpty()){
-            di.add(0);
+            if(todayDay.equals("Dienstag")){
+                di.add(LocationTracking.stepCount);
+            }else{
+                di.add(0);
+            }
         }
         if(mi.isEmpty()){
-            mi.add(0);
+            if(todayDay.equals("Mittwoch")){
+                mi.add(LocationTracking.stepCount);
+            }else{
+                mi.add(0);
+            }
         }
         if(don.isEmpty()){
-            don.add(0);
+            if(todayDay.equals("Donnerstag")){
+                don.add(LocationTracking.stepCount);
+            }else{
+                don.add(0);
+            }
         }
         if(fr.isEmpty()){
-            fr.add(0);
+            if(todayDay.equals("Freitag")){
+                fr.add(LocationTracking.stepCount);
+            }else{
+                fr.add(0);
+            }
         }
         if(sa.isEmpty()){
-            sa.add(0);
+            if(todayDay.equals("Samstag")){
+                sa.add(LocationTracking.stepCount);
+            }else{
+                sa.add(0);
+            }
         }
         if(so.isEmpty()){
-            so.add(0);
+            if(todayDay.equals("Sonntag")){
+                so.add(LocationTracking.stepCount);
+            }else{
+                so.add(0);
+            }
         }
 
     }
