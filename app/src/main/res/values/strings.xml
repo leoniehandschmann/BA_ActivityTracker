@@ -12,4 +12,10 @@
     <string name="notification_channel_descript">Channel for Data Export Reminder</string>
     <string name="notification_title">Erinnerung zum Daten Export</string>
     <string name="notification_text">Hast du deine Daten heute schon bewertet und exportiert?</string>
+    <string name="info_homescreen">Hier befindet sich der Homescreen. \n\nDu siehst hier eine Übersicht über deine Schritte in dieser Woche. \n\nZudem zeigt eine Liste die Standorte an, an denen du dich heute aufgehalten hast.</string>
+    <string name="info_location">Hier befindet sich das Location Tracking. \n\nDein Standort wird jede Stunde erfasst und gespeichert. Außerdem kannst du deinen heutigen zurückgelegten Weg auch in der Karte anhand der rote Linie erkennen. \n\nDeine Schrittanzahl wird ebenso erfasst und dokumentiert. Wechsle den Regler, dann siehst du deine zurückgelegten Kilometer.</string>
+    <string name="info_screenTime">Beim Screentime Tracking kannst du deine installierten Apps in die Bereiche \'Work\' und \'Life\' einteilen. \n\n Das System zeigt dir dann deine verbrachte Zeit in den Apps an.</string>
+    <string name="info_evaluation">Hier bitten wir dich all die gesammelten Daten zu evaluieren. \nDas ist eine rein subjektive Beurteilung der Aktivitäten, du kannst also nichts falsch machen!</string>
+    <string name="info_export">Hier sollen deine Daten einmal täglich an unser Team übermittelt werden. \nEs wird eine Übersicht aller zu exportierenden Daten gegeben. \n\nMöchtest du noch etwas hinzufügen? Nutze gerne das AnmerkungenFeld für persönliche Notizen.</string>
+
 </resources>

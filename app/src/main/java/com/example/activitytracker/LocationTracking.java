@@ -274,6 +274,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
                     buffer.append("Timestamp: "+cursor.getString(3)+"\n\n");
                 }
 
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(LocationTracking.this.getContext());
                 builder.setCancelable(true);
                 builder.setTitle("Last Locations");
