@@ -57,6 +57,9 @@ public class HomeScreen extends Fragment {
     private ArrayList<Integer>sa;
     private ArrayList<Integer>so;
 
+    ArrayList <String> latNotOlderThan24H;
+    ArrayList <String> longNotOlderThan24H;
+
 
     public HomeScreen() {
         // Required empty public constructor
@@ -92,10 +95,12 @@ public class HomeScreen extends Fragment {
         };
         handler.postDelayed(runnable, 30000);
 
-
-
-
-        initLocationListView();
+        locDataNotOlderThan24();
+        try {
+            initLocationListView();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         return view;
     }
@@ -134,22 +139,28 @@ public class HomeScreen extends Fragment {
 
 
 
-    private void initLocationListView(){
+    private void initLocationListView() throws IOException {
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
         addresses = new ArrayList<String>();
         addressesList = new ArrayList<String>();
 
-
-        if(c.moveToFirst()){
-            do{
-                try {
-                    addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } while (c.moveToNext());
+        if(latNotOlderThan24H!=null){
+            for(int i =0;i<latNotOlderThan24H.size();i++){
+                addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(latNotOlderThan24H.get(i)),Double.parseDouble(longNotOlderThan24H.get(i)), getActivity().getApplicationContext()));
+            }
+        }else {
+            if (c.moveToFirst()) {
+                do {
+                    try {
+                        addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)), Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } while (c.moveToNext());
+            }
         }
+
 
         Set<String> set = new HashSet<>();
         for (String s : addresses) {
@@ -216,47 +227,19 @@ public class HomeScreen extends Fragment {
                         String day = DateFormat.format("EEEE", date).toString();
 
                         if(day.equals("Montag")){
-                            if(day.equals(todayDay)){
-                                mo.add(LocationTracking.stepCount);
-                            }else{
-                                mo.add(valueFromDB);
-                            }
+                            mo.add(valueFromDB);
                         }else if (day.equals("Dienstag")){
-                            if(day.equals(todayDay)){
-                                di.add(LocationTracking.stepCount);
-                            }else{
-                                di.add(valueFromDB);
-                            }
+                            di.add(valueFromDB);
                         } else if (day.equals("Mittwoch")){
-                            if(day.equals(todayDay)){
-                                mi.add(LocationTracking.stepCount);
-                            }else{
-                                mi.add(valueFromDB);
-                            }
+                            mi.add(valueFromDB);
                         }else if (day.equals("Donnerstag")){
-                            if(day.equals(todayDay)){
-                                don.add(LocationTracking.stepCount);
-                            }else{
-                                don.add(valueFromDB);
-                            }
+                            don.add(valueFromDB);
                         }else if (day.equals("Freitag")){
-                            if(day.equals(todayDay)){
-                                fr.add(LocationTracking.stepCount);
-                            }else{
-                                fr.add(valueFromDB);
-                            }
+                            fr.add(valueFromDB);
                         }else if (day.equals("Samstag")){
-                            if(day.equals(todayDay)){
-                                sa.add(LocationTracking.stepCount);
-                            }else{
-                                sa.add(valueFromDB);
-                            }
+                            sa.add(valueFromDB);
                         }else if (day.equals("Sonntag")){
-                            if(day.equals(todayDay)){
-                                so.add(LocationTracking.stepCount);
-                            }else{
-                                so.add(valueFromDB);
-                            }
+                            so.add(valueFromDB);
                         }
                     } catch (ParseException e) {
                         e.printStackTrace();
@@ -391,6 +374,28 @@ public class HomeScreen extends Fragment {
         return barDataList2;
     }
 
+    private void locDataNotOlderThan24 (){
+        location_dbHelper db2 = new location_dbHelper(getActivity().getApplicationContext());
+        latNotOlderThan24H = new ArrayList<>();
+        longNotOlderThan24H = new ArrayList<>();
+
+
+        Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp <= date('now','-1 days') ", null);
+        if (curs.moveToFirst()){
+            do {
+                // Passing values
+                String column1 = curs.getString(0);
+                String column2 = curs.getString(1);
+                latNotOlderThan24H.add(column1);
+                longNotOlderThan24H.add(column2);
+                // Do something Here with values
+            } while(curs.moveToNext());
+        }
+        curs.close();
+        db2.close();
+        Log.d("mcdonalds", String.valueOf(latNotOlderThan24H));
+        Log.d("mcdonalds", String.valueOf(longNotOlderThan24H));
+    }
 
 
 

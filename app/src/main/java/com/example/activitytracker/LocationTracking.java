@@ -159,6 +159,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         return view;
     }
 
+
     //init step sensor and counter
     private void initStepCounter(){
         SensorManager sensorManager = (SensorManager) getActivity().getApplicationContext().getSystemService(getContext().SENSOR_SERVICE);

@@ -7,6 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 public class location_dbHelper extends SQLiteOpenHelper {
     //public dbHelper(Context context) {super(context, "LocationDataDB", null, 1);}
 
@@ -59,19 +61,20 @@ public class location_dbHelper extends SQLiteOpenHelper {
     }
 
 
-    public Boolean deleteDataOlderThan24Hours(){
+    public Boolean getDataNotOlderThan24H(){
         SQLiteDatabase db = this.getWritableDatabase();
 
 
-        Cursor cursor = db.rawQuery("Delete FROM locations where timestamp <= date('now','-2 days')",null);
+        Cursor cursor = db.rawQuery("SELECT ALL locations where timestamp <= date('now','-1 days')",null);
         if(cursor.getCount()>1){
 
-            long result = db.delete("locations","timestamp <= date('now','-2 days')", null);
+            long result = db.delete("locations","timestamp <= date('now','-1 days')", null);
             return result != -1;
 
         }else{
             return false;
         }
+
     }
 
 
