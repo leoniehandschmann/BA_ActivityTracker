@@ -6,38 +6,80 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/tv_steps_overview"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="20dp"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        android:text="Übersicht deiner Schritte in dieser Woche"/>
+        android:layout_height="match_parent">
 
-    <com.github.mikephil.charting.charts.BarChart
-        android:id="@+id/step_chart"
-        android:layout_width="350dp"
-        android:layout_height="300dp"
-        android:layout_marginTop="80dp"
-        android:layout_centerHorizontal="true"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center">
 
-    <TextView
-        android:id="@+id/tv_location_overview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_marginTop="450dp"
-        android:textSize="20dp"
-        android:textStyle="bold"
-        android:text="Übersicht deiner Standorte heute"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:background="@color/purple_700">
 
-    <ListView
-        android:id="@+id/location_list"
-        android:layout_width="300dp"
-        android:layout_height="400dp"
-        android:layout_marginTop="500dp"
-        android:layout_centerHorizontal="true" />
+            <TextView
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:text="Herzlich Willkommen! "
+                android:gravity="center"
+                android:layout_marginTop="30dp"
+                android:layout_marginLeft="30dp"
+                android:textSize="30dp"
+                android:textStyle="bold"/>
+
+            <ImageView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/logo" />
+
+
+        </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/tv_steps_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="20dp"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:text="Deine Schritte diese Woche:"/>
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/step_chart"
+                android:layout_width="350dp"
+                android:layout_height="300dp"
+                android:layout_marginTop="30dp"
+                android:layout_centerHorizontal="true"/>
+
+            <TextView
+                android:id="@+id/tv_location_overview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_marginTop="50dp"
+                android:textSize="20dp"
+                android:textStyle="bold"
+                android:text="Deine Standorte heute:"/>
+
+            <ListView
+                android:id="@+id/location_list"
+                android:layout_width="300dp"
+                android:layout_height="400dp"
+                android:layout_marginTop="20dp"
+                android:layout_centerHorizontal="true" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
 
 </RelativeLayout>

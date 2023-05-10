@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -41,6 +42,9 @@ public class Evaluation extends Fragment{
     private View screenTimeEvalView_life;
     private View screenTimeEvalView_work;
     private LinearLayout mainLL;
+    ArrayList <String> latNotOld;
+    ArrayList <String> longNotOld;
+    private ScrollView scroll_main;
 
     @Nullable
     @Override
@@ -50,8 +54,10 @@ public class Evaluation extends Fragment{
             inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         }
         parent = (LinearLayout) inflater.inflate(R.layout.activity_evaluation, null);
-        mainLL = parent.findViewById(R.id.main_eval_layout);
+        scroll_main = parent.findViewById(R.id.scroll_main);
+        mainLL = scroll_main.findViewById(R.id.main_eval_layout);
         evaluation_db = new evaluation_dbHelper(getActivity().getApplicationContext());
+        locDataNotOlderThan24();
 
         //init location evaluations
         initLocations(inflater);
@@ -74,7 +80,7 @@ public class Evaluation extends Fragment{
             @Override
             public void run() {
                 try{
-                    mainLL.removeView(locationEvalView);
+                    mainLL.removeAllViews();
                     getLocationData();
                     if(locWODupli.size() != 0){
                         for (int i = 0; i < locWODupli.size(); i++) {
@@ -196,21 +202,27 @@ public class Evaluation extends Fragment{
 
 
     //get location data from LocationDB --> without duplicate Locations
-    private void getLocationData(){
+    private void getLocationData() throws IOException {
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
         locationsFromDB = new ArrayList<String>();
         locWODupli = new ArrayList<String>();
 
 
-        if(c.moveToFirst()){
-            do{
-                try {
-                    locationsFromDB.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } while (c.moveToNext());
+        if(latNotOld!=null){
+            for(int i =0;i<latNotOld.size();i++){
+                locationsFromDB.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(latNotOld.get(i)),Double.parseDouble(longNotOld.get(i)), getActivity().getApplicationContext()));
+            }
+        }else {
+            if(c.moveToFirst()){
+                do{
+                    try {
+                        locationsFromDB.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } while (c.moveToNext());
+            }
         }
 
         Set<String> set = new HashSet<>();
@@ -219,6 +231,27 @@ public class Evaluation extends Fragment{
                 locWODupli.add(s);
             }
         }
+    }
+
+    private void locDataNotOlderThan24 (){
+        location_dbHelper db2 = new location_dbHelper(getActivity().getApplicationContext());
+        latNotOld = new ArrayList<>();
+        longNotOld = new ArrayList<>();
+
+
+        Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp <= date('now','-1 days') ", null);
+        if (curs.moveToFirst()){
+            do {
+                // Passing values
+                String column1 = curs.getString(0);
+                String column2 = curs.getString(1);
+                latNotOld.add(column1);
+                longNotOld.add(column2);
+                // Do something Here with values
+            } while(curs.moveToNext());
+        }
+        curs.close();
+        db2.close();
     }
 
 
@@ -248,7 +281,8 @@ public class Evaluation extends Fragment{
         submit_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                LinearLayout mainLL = parent.findViewById(R.id.main_eval_layout);
+                //LinearLayout mainLL = parent.findViewById(R.id.main_eval_layout);
+                LinearLayout mainLL = scroll_main.findViewById(R.id.main_eval_layout);
 
                 for (int i = 0; i < mainLL.getChildCount(); i++) {
                     View view = mainLL.getChildAt(i);

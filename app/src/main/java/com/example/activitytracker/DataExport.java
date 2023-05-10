@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TableLayout;
@@ -45,6 +46,8 @@ public class DataExport extends Fragment{
     private TableLayout table_life;
     private TableLayout table_work;
     public static TextView stepsOverview;
+    private annotations_dbHelper annotations_db;
+    private EditText annotation_field;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -55,6 +58,8 @@ public class DataExport extends Fragment{
         exportBtn = view.findViewById(R.id.export_btn);
         screenTime_db = new screenTime_dbHelper(getActivity().getApplicationContext());
         steps_db = new steps_dbHelper(getActivity().getApplicationContext());
+        annotation_field = view.findViewById(R.id.comment_export);
+        annotations_db = new annotations_dbHelper(getActivity().getApplicationContext());
         saveDataBtnClick();
 
         stepsOverview = view.findViewById(R.id.tv_steps_export_data);
@@ -96,6 +101,7 @@ public class DataExport extends Fragment{
             public void onClick(View v) {
                 saveScreenTimeInDB();
                 saveStepsInDB();
+                saveAnnotations();
             }
         });
 
@@ -135,6 +141,20 @@ public class DataExport extends Fragment{
         }else{
             Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void saveAnnotations(){
+        Calendar c = Calendar.getInstance();
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        String formattedDate = df.format(c.getTime());
+
+        Boolean checkInsert = annotations_db.insertData(String.valueOf(annotation_field.getText()),formattedDate);
+        if(checkInsert==true){
+            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.annotations_db_success), Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
+        }
+
     }
 
 

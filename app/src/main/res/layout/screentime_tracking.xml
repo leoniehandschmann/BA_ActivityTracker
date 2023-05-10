@@ -1,50 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linlay_screenTrack"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/choose_life"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Choose 'Life' Apps"
-        android:background="@android:drawable/editbox_background"
-        android:drawableEnd="@android:drawable/arrow_down_float"/>
+        <LinearLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/app_table_life"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1"
-        android:layout_gravity="center"
-        android:layout_marginTop="50dp">
-    </TableLayout>
+            <TextView
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
 
-    <TextView
-        android:id="@+id/choose_work"
-        android:layout_width="300dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="50dp"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="Choose 'Work' Apps"
-        android:background="@android:drawable/editbox_background"
-        android:drawableEnd="@android:drawable/arrow_down_float"/>
+                android:background="@color/quantum_grey100"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:text="@string/screenTime_infobox"/>
 
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/app_table_work"
-        android:layout_width="350dp"
-        android:layout_height="wrap_content"
-        android:stretchColumns="1"
-        android:layout_gravity="center"
-        android:layout_marginTop="50dp">
-    </TableLayout>
+            <TextView
+                android:id="@+id/choose_life"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Apps des Bereiches 'Life'"
+                android:background="@android:drawable/editbox_background"
+                android:drawableEnd="@android:drawable/arrow_down_float"/>
+
+            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/app_table_life"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp">
+            </TableLayout>
+
+            <TextView
+                android:id="@+id/choose_work"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="50dp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:text="Apps des Bereiches 'Work'"
+                android:background="@android:drawable/editbox_background"
+                android:drawableEnd="@android:drawable/arrow_down_float"/>
+
+            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/app_table_work"
+                android:layout_width="350dp"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"
+                android:layout_gravity="center"
+                android:layout_marginTop="50dp">
+            </TableLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
 
 </LinearLayout>

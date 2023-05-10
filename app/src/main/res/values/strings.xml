@@ -7,6 +7,7 @@
     <string name="loc_db_success">Location wurde gespeichert</string>
     <string name="steps_db_success">Schrittanzahl wurde gespeichert</string>
     <string name="screentime_db_success">Screentime wurde gespeichert</string>
+    <string name="annotations_db_success">Anmerkung wurde gespeichert</string>
     <string name="db_no_success">Es konnte leider nichts gespeichert werden. Versuche es später erneut</string>
     <string name="notification_channel_name">AtivoReminderChannel</string>
     <string name="notification_channel_descript">Channel for Data Export Reminder</string>
@@ -17,5 +18,7 @@
     <string name="info_screenTime">Beim Screentime Tracking kannst du deine installierten Apps in die Bereiche \'Work\' und \'Life\' einteilen. \n\n Das System zeigt dir dann deine verbrachte Zeit in den Apps an.</string>
     <string name="info_evaluation">Hier bitten wir dich all die gesammelten Daten zu evaluieren. \nDas ist eine rein subjektive Beurteilung der Aktivitäten, du kannst also nichts falsch machen!</string>
     <string name="info_export">Hier sollen deine Daten einmal täglich an unser Team übermittelt werden. \nEs wird eine Übersicht aller zu exportierenden Daten gegeben. \n\nMöchtest du noch etwas hinzufügen? Nutze gerne das AnmerkungenFeld für persönliche Notizen.</string>
+    <string name="screenTime_infobox">Bitte teile hier die,von dir gewollten Apps, in die Bereiche \'Life\' und \'Work\' ein. \n\nNur von den ausgewählten Apps werden die Nutzungszeiten gespeichert."</string>
+    <string name="eval_infobox">Bitte bewerte hier deine heutigen Aktivitäten. \n\n Dies ist eine subjektive Einschätzung deiner Empfindungen. \n Es besteht die Möglichkeit die Daten sowohl positiv als auch negativ zu bewerten. \n\n Falls die dargestellten Daten für dich irrelevant sind, lösche diese bitte durch einen Click auf den Mülleimer.</string>
 
 </resources>

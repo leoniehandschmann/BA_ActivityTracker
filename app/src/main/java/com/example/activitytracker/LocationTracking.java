@@ -168,6 +168,13 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         SensorEventListener stepDetector = new SensorEventListener() {
             @Override
             public void onSensorChanged(SensorEvent event) {
+                Calendar cal = Calendar.getInstance();
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                if(System.currentTimeMillis() == cal.getTimeInMillis()){
+                    stepCount = 0;
+                };
                 if(event != null){
                     float x_acceleration = event.values[0];
                     float y_acceleration = event.values[1];

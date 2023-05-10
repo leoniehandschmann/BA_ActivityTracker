@@ -63,7 +63,6 @@ public class ScreenTimeTracking extends Fragment{
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.screentime_tracking, container, false);
         init(view);
-        checkPermission();
 
         try {
             getinstalledApps();
@@ -71,8 +70,15 @@ public class ScreenTimeTracking extends Fragment{
             throw new RuntimeException(e);
         }
 
-        initAppChooser(tv_choose_life_apps,selectedApps_Life,selectedAppsList_Life,selectedPackages_Life);
+        if(checkUsagePermission(getActivity().getApplicationContext())){
+            updateAppUsage();
+        }else{
+            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
+        }
 
+        selectedApps_Life = new boolean[appsPackList.size()];
+        initAppChooser(tv_choose_life_apps,selectedApps_Life,selectedAppsList_Life,selectedPackages_Life);
+        selectedApps_Work = new boolean[appsPackList.size()];
         initAppChooser(tv_choose_work_apps,selectedApps_Work,selectedAppsList_Work,selectedPackages_Work);
 
         return view;
@@ -91,18 +97,8 @@ public class ScreenTimeTracking extends Fragment{
         selectedAppsList_Work = new ArrayList<>();
         selectedPackages_Work = new ArrayList<>();
         screenTime_db = new screenTime_dbHelper(getActivity().getApplicationContext());
-        selectedApps_Life = new boolean[appsPackList.size()];
-        selectedApps_Work = new boolean[appsPackList.size()];
     }
 
-    //check permission for app usage time
-    private void checkPermission(){
-        if(checkUsagePermission(getActivity().getApplicationContext())){
-            updateAppUsage();
-        }else{
-            startActivity(new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS));
-        }
-    }
 
     private boolean checkUsagePermission(Context c){
         AppOpsManager appOps = (AppOpsManager)
