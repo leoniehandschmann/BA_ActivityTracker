@@ -42,8 +42,8 @@ public class Evaluation extends Fragment{
     private View screenTimeEvalView_life;
     private View screenTimeEvalView_work;
     private LinearLayout mainLL;
-    ArrayList <String> latNotOld;
-    ArrayList <String> longNotOld;
+    private ArrayList <String> latNotOld;
+    private ArrayList <String> longNotOld;
     private ScrollView scroll_main;
 
     @Nullable
@@ -96,11 +96,11 @@ public class Evaluation extends Fragment{
                     Log.d("updateTV", getString(R.string.log_no_success));
                 }
                 finally{
-                    handler.postDelayed(this, 30000);
+                    handler.postDelayed(this, 10000);
                 }
             }
         };
-        handler.postDelayed(runnable, 30000);
+        handler.postDelayed(runnable, 10000);
     }
 
 
@@ -143,11 +143,11 @@ public class Evaluation extends Fragment{
                     Log.d("updateTV",getString(R.string.log_no_success));
                 }
                 finally{
-                    handler.postDelayed(this, 30000);
+                    handler.postDelayed(this, 10000);
                 }
             }
         };
-        handler.postDelayed(runnable, 30000);
+        handler.postDelayed(runnable, 10000);
     }
 
 
@@ -239,14 +239,18 @@ public class Evaluation extends Fragment{
         longNotOld = new ArrayList<>();
 
 
-        Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp <= date('now','-1 days') ", null);
+        Cursor curs = db2.getData();
+        //Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp < date('now','-24 hours') ", null);
         if (curs.moveToFirst()){
             do {
+
+                if(!(Long.parseLong(curs.getString(3)) <= System.currentTimeMillis() - 60*60*24*1000)){
+                    String column1 = curs.getString(1);
+                    String column2 = curs.getString(2);
+                    latNotOld.add(column1);
+                    longNotOld.add(column2);
+                }
                 // Passing values
-                String column1 = curs.getString(0);
-                String column2 = curs.getString(1);
-                latNotOld.add(column1);
-                longNotOld.add(column2);
                 // Do something Here with values
             } while(curs.moveToNext());
         }

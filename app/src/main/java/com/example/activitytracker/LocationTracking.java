@@ -122,8 +122,6 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.location_tracking, container, false);
         location_db = new location_dbHelper(getActivity().getApplicationContext());
 
-        //location_db.deleteDataOlderThan24Hours();
-
         viewDB = view.findViewById(R.id.viewDB);
 
         counter = view.findViewById(R.id.counter_view);
@@ -153,8 +151,6 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         }
 
         viewLocationsInDB();
-
-        //getStayTime();
 
         return view;
     }
@@ -204,38 +200,6 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     }
 
 
-    private int getStayTime(){
-       int stayTime = 2;
-
-        Cursor c = location_db.getData();
-        ArrayList <String> locs = new ArrayList<String>();
-
-
-        if(c.moveToFirst()){
-            do{
-                try {
-                    locs.add(getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } while (c.moveToNext());
-        }
-
-        for (int i = 0; i < locs.size(); i++) {
-            for (int j = i + 1 ; j < locs.size(); j++) {
-                if (Objects.equals(locs.get(i), locs.get(j))) {
-                    stayTime = stayTime + 2;
-                    Log.d("seli",String.valueOf(stayTime) + " min at " + locs.get(i));
-                }else{
-                    stayTime = 2;
-                    Log.d("seli",String.valueOf(stayTime) + " min at " + locs.get(i));
-                }
-
-            }
-
-        }
-        return stayTime;
-    }
 
     //get address from Lat and Long Coordinates
     public static String getAddressFromLatLong(Double lat,Double lng,Context context) throws IOException {
@@ -246,9 +210,10 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     }
 
     //transfer millis in date to real time
-    public static String realTime(Date d)
+    public static String realTime(long millis)
     {
         SimpleDateFormat sdf = new SimpleDateFormat("kk:mm:ss");
+        Date d = new Date(millis);
         sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         String result = sdf.format(d);
         return result;
@@ -256,9 +221,10 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
 
 
     //transfer millis in date to real date
-    public static String realDate(Date d)
+    public static String realDate(long millis)
     {
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy");
+        Date d = new Date(millis);
         sdf.setTimeZone(TimeZone.getTimeZone("Europe/Berlin"));
         String result = sdf.format(d);
         return result;
@@ -279,7 +245,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
                     buffer.append("ID: "+cursor.getString(0)+"\n");
                     buffer.append("Latitude: "+cursor.getString(1)+"\n");
                     buffer.append("Longitude: "+cursor.getString(2)+"\n");
-                    buffer.append("Timestamp: "+cursor.getString(3)+"\n\n");
+                    buffer.append("Timestamp: "+realDate(Long.parseLong(cursor.getString(3))) + " " + realTime(Long.parseLong(cursor.getString(3)))+"\n\n");
                 }
 
 
@@ -442,14 +408,8 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
             public void onLocationResult(@NonNull LocationResult locationResult) {
                 super.onLocationResult(locationResult);
                 currentLocation = locationResult.getLastLocation();
-                Date date = new Date(currentLocation.getTime());
-                String currentTime = realTime(date);
-                String currentDate = realDate(date);
-                String timestamp = currentTime + " " + currentDate;
 
-                Boolean checkInsert = location_db.insertData(currentLocation.getLatitude(),currentLocation.getLongitude(), timestamp);
-                //getDataFromDBInArrays(getActivity().getApplicationContext());
-
+                Boolean checkInsert = location_db.insertData(currentLocation.getLatitude(),currentLocation.getLongitude(), System.currentTimeMillis());
 
                 //add polyline from db locations to map
                 PolylineOptions options = new PolylineOptions();

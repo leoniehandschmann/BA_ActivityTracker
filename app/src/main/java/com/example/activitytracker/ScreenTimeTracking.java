@@ -62,7 +62,17 @@ public class ScreenTimeTracking extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.screentime_tracking, container, false);
-        init(view);
+        tv_choose_life_apps = view.findViewById(R.id.choose_life);
+        tv_choose_work_apps = view.findViewById(R.id.choose_work);
+        appTable_Life = view.findViewById(R.id.app_table_life);
+        appTable_Work = view.findViewById(R.id.app_table_work);
+        appsPackList = new ArrayList<>();
+        appsIconsList = new ArrayList<>();
+        selectedAppsList_Life = new ArrayList<>();
+        selectedPackages_Life = new ArrayList<>();
+        selectedAppsList_Work = new ArrayList<>();
+        selectedPackages_Work = new ArrayList<>();
+        screenTime_db = new screenTime_dbHelper(getActivity().getApplicationContext());
 
         try {
             getinstalledApps();
@@ -86,21 +96,11 @@ public class ScreenTimeTracking extends Fragment{
 
     //init all views and lists
     private void init(View view){
-        tv_choose_life_apps = view.findViewById(R.id.choose_life);
-        tv_choose_work_apps = view.findViewById(R.id.choose_work);
-        appTable_Life = view.findViewById(R.id.app_table_life);
-        appTable_Work = view.findViewById(R.id.app_table_work);
-        appsPackList = new ArrayList<>();
-        appsIconsList = new ArrayList<>();
-        selectedAppsList_Life = new ArrayList<>();
-        selectedPackages_Life = new ArrayList<>();
-        selectedAppsList_Work = new ArrayList<>();
-        selectedPackages_Work = new ArrayList<>();
-        screenTime_db = new screenTime_dbHelper(getActivity().getApplicationContext());
+
     }
 
 
-    private boolean checkUsagePermission(Context c){
+    public static boolean checkUsagePermission(Context c){
         AppOpsManager appOps = (AppOpsManager)
                 c.getSystemService(Context.APP_OPS_SERVICE);
         int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS,
@@ -124,11 +124,11 @@ public class ScreenTimeTracking extends Fragment{
                     Log.d("updateTV",getString(R.string.log_no_success));
                 }
                 finally{
-                    handler.postDelayed(this, 30000);
+                    handler.postDelayed(this, 10000);
                 }
             }
         };
-        handler.postDelayed(runnable, 30000);
+        handler.postDelayed(runnable, 10000);
 
     }
 

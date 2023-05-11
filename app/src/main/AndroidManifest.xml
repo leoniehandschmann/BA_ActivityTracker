@@ -13,9 +13,6 @@
 
 
     <queries>
-        <package android:name="com.google.android.gm" />
-        <package android:name="com.facebook.katana" />
-        <package android:name="com.instagram.android" />
         <intent>
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />

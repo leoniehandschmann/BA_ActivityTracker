@@ -24,7 +24,7 @@ public class location_dbHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         //LocationDetails
-        db.execSQL("create Table locations(activity_id INTEGER PRIMARY KEY AUTOINCREMENT, latitude DOUBLE, longitude DOUBLE, timestamp STRING)");
+        db.execSQL("create Table locations(activity_id INTEGER PRIMARY KEY AUTOINCREMENT, latitude DOUBLE, longitude DOUBLE, timestamp LONG)");
 
     }
 
@@ -35,7 +35,7 @@ public class location_dbHelper extends SQLiteOpenHelper {
     }
 
 
-    public Boolean insertData(double latitude,double longitude,String timestamp){
+    public Boolean insertData(double latitude,double longitude,long timestamp){
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues content = new ContentValues();
@@ -58,23 +58,6 @@ public class location_dbHelper extends SQLiteOpenHelper {
         Cursor cursor = db.rawQuery("Select * from locations", null);
         cursor.moveToFirst();
         return cursor;
-    }
-
-
-    public Boolean getDataNotOlderThan24H(){
-        SQLiteDatabase db = this.getWritableDatabase();
-
-
-        Cursor cursor = db.rawQuery("SELECT ALL locations where timestamp <= date('now','-1 days')",null);
-        if(cursor.getCount()>1){
-
-            long result = db.delete("locations","timestamp <= date('now','-1 days')", null);
-            return result != -1;
-
-        }else{
-            return false;
-        }
-
     }
 
 

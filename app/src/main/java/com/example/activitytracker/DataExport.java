@@ -48,12 +48,19 @@ public class DataExport extends Fragment{
     public static TextView stepsOverview;
     private annotations_dbHelper annotations_db;
     private EditText annotation_field;
+    private ArrayList <String> latNotOld;
+    private ArrayList <String> longNotOld;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.data_export_activity, container, false);
         locationListOverview = view.findViewById(R.id.locations_data_export);
-        initLocationOverview();
+        locDataNotOlderThan24();
+        try {
+            initLocationOverview();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
         exportBtn = view.findViewById(R.id.export_btn);
         screenTime_db = new screenTime_dbHelper(getActivity().getApplicationContext());
@@ -159,21 +166,26 @@ public class DataExport extends Fragment{
 
 
     //init Overview of all visited Locations
-    private void initLocationOverview(){
+    private void initLocationOverview() throws IOException {
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
         addressesFromDB = new ArrayList<String>();
         addressesListWODupli = new ArrayList<String>();
 
-
-        if(c.moveToFirst()){
-            do{
-                try {
-                    addressesFromDB.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            } while (c.moveToNext());
+        if(latNotOld!=null){
+            for(int i =0;i<latNotOld.size();i++){
+                addressesFromDB.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(latNotOld.get(i)),Double.parseDouble(longNotOld.get(i)), getActivity().getApplicationContext()));
+            }
+        }else {
+            if(c.moveToFirst()){
+                do{
+                    try {
+                        addressesFromDB.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } while (c.moveToNext());
+            }
         }
 
         Set<String> set = new HashSet<>();
@@ -188,6 +200,27 @@ public class DataExport extends Fragment{
         locationListOverview.setAdapter(listViewAdapter2);
     }
 
+    private void locDataNotOlderThan24 (){
+        location_dbHelper db2 = new location_dbHelper(getActivity().getApplicationContext());
+        latNotOld = new ArrayList<>();
+        longNotOld = new ArrayList<>();
+
+
+        Cursor curs = db2.getData();
+        if (curs.moveToFirst()){
+            do {
+
+                if(!(Long.parseLong(curs.getString(3)) <= System.currentTimeMillis() - 60*60*24*1000)){
+                    String column1 = curs.getString(1);
+                    String column2 = curs.getString(2);
+                    latNotOld.add(column1);
+                    longNotOld.add(column2);
+                }
+            } while(curs.moveToNext());
+        }
+        curs.close();
+        db2.close();
+    }
 
 
 }

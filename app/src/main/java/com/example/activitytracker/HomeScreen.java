@@ -27,6 +27,7 @@ import com.github.mikephil.charting.formatter.ValueFormatter;
 import com.github.mikephil.charting.utils.ColorTemplate;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -82,18 +83,18 @@ public class HomeScreen extends Fragment {
                         initStepBarChart(getBarDataWithEmptyDB());
                     }else{
                         initDaysValues();
-                        initStepBarChart(getBarData());
+                        initStepBarChart(testBarData());
                     }
                 }
                 catch (Exception e) {
                     Log.d("updateTV","not successful");
                 }
                 finally{
-                    handler.postDelayed(this, 30000);
+                    handler.postDelayed(this, 10000);
                 }
             }
         };
-        handler.postDelayed(runnable, 30000);
+        handler.postDelayed(runnable, 10000);
 
         locDataNotOlderThan24();
         try {
@@ -379,15 +380,18 @@ public class HomeScreen extends Fragment {
         latNotOlderThan24H = new ArrayList<>();
         longNotOlderThan24H = new ArrayList<>();
 
-
-        Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp <= date('now','-1 days') ", null);
+        Cursor curs = db2.getData();
+        //Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp < date('now','-24 hours') ", null);
         if (curs.moveToFirst()){
             do {
+
+                if(!(Long.parseLong(curs.getString(3)) <= System.currentTimeMillis() - 60*60*24*1000)){
+                    String column1 = curs.getString(1);
+                    String column2 = curs.getString(2);
+                    latNotOlderThan24H.add(column1);
+                    longNotOlderThan24H.add(column2);
+                }
                 // Passing values
-                String column1 = curs.getString(0);
-                String column2 = curs.getString(1);
-                latNotOlderThan24H.add(column1);
-                longNotOlderThan24H.add(column2);
                 // Do something Here with values
             } while(curs.moveToNext());
         }
@@ -397,10 +401,19 @@ public class HomeScreen extends Fragment {
         Log.d("mcdonalds", String.valueOf(longNotOlderThan24H));
     }
 
+    private ArrayList<BarEntry> testBarData(){
+        barDataList = new ArrayList<BarEntry>();
 
+        barDataList.add(new BarEntry(0.5f,1200));
+        barDataList.add(new BarEntry(1.5f,200));
+        barDataList.add(new BarEntry(2.5f,4000));
+        barDataList.add(new BarEntry(3.5f,LocationTracking.stepCount));
+        barDataList.add(new BarEntry(4.5f,2300));
+        barDataList.add(new BarEntry(5.5f,500));
+        barDataList.add(new BarEntry(6.6f,5000));
 
-
-
+        return barDataList;
+    }
 
 
 
