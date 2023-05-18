@@ -82,6 +82,9 @@ public class HomeScreen extends Fragment {
         overViewLocTime = view.findViewById(R.id.overview_stayTime_locs);
 
 
+        initStepBarChart(testBarData());
+
+
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
 
@@ -108,7 +111,7 @@ public class HomeScreen extends Fragment {
 
         locDataNotOlderThan24();
         try {
-            initLocationListView();
+            initLocations();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -151,7 +154,7 @@ public class HomeScreen extends Fragment {
 
 
 
-    private void initLocationListView() throws IOException {
+    private void initLocations() throws IOException {
         location_dbHelper db = new location_dbHelper(getActivity().getApplicationContext());
         Cursor c = db.getData();
         addresses = new ArrayList<String>();
@@ -185,7 +188,7 @@ public class HomeScreen extends Fragment {
 
     }
 
-    public static void initTableStayTimeLocs(Context c){
+    private void initTableStayTimeLocs(Context c){
         overViewLocTime.removeAllViews();
 
         for(int i = 0; i < LocationTracking.mapStayTime.size(); i++){

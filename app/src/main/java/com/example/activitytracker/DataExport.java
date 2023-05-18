@@ -1,6 +1,8 @@
 package com.example.activitytracker;
 
+import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,7 +38,6 @@ import java.util.Set;
 
 public class DataExport extends Fragment{
 
-    public static ListView locationListOverview;
     public static ArrayList<String> addressesFromDB;
     public static ArrayList<String> addressesListWODupli;
     public static ArrayAdapter <String> listViewAdapter2;
@@ -50,11 +51,12 @@ public class DataExport extends Fragment{
     private EditText annotation_field;
     private ArrayList <String> latNotOld;
     private ArrayList <String> longNotOld;
+    private TableLayout overview_time_locs_exp;
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.data_export_activity, container, false);
-        locationListOverview = view.findViewById(R.id.locations_data_export);
+        overview_time_locs_exp = view.findViewById(R.id.overview_stayTime_locs_export);
         locDataNotOlderThan24();
         try {
             initLocationOverview();
@@ -89,6 +91,7 @@ public class DataExport extends Fragment{
                 try{
                     ScreenTimeTracking.setTableRows(ScreenTimeTracking.selectedPackages_Life,table_life,getActivity().getApplicationContext(),true);
                     ScreenTimeTracking.setTableRows(ScreenTimeTracking.selectedPackages_Work,table_work,getActivity().getApplicationContext(),true);
+                    initTableStayTimeLocs(getActivity().getApplicationContext());
                 }
                 catch (Exception e) {
                     Log.d("updateTV",getString(R.string.log_no_success));
@@ -194,10 +197,26 @@ public class DataExport extends Fragment{
                 addressesListWODupli.add(s);
             }
         }
+    }
 
-        listViewAdapter2 = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesListWODupli);
+    private void initTableStayTimeLocs(Context c){
+        overview_time_locs_exp.removeAllViews();
 
-        locationListOverview.setAdapter(listViewAdapter2);
+        for(int i = 0; i < LocationTracking.mapStayTime.size(); i++){
+            TableRow tr = new TableRow(c);
+            TextView t1 = new TextView(c);
+            t1.setText(addressesListWODupli.get(i));
+            t1.setTextSize(15);
+            t1.setTypeface(null, Typeface.BOLD_ITALIC);
+            t1.setPadding(50,100,0,0);
+            tr.addView(t1);
+
+            TextView t2 = new TextView(c);
+            t2.setText("~ " + LocationTracking.mapStayTime.get(addressesListWODupli.get(i)) + " Min");
+            t2.setGravity(Gravity.RIGHT);
+            tr.addView(t2);
+            overview_time_locs_exp.addView(tr);
+        }
     }
 
     private void locDataNotOlderThan24 (){

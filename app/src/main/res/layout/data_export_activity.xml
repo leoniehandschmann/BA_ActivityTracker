@@ -17,19 +17,22 @@
 
             <TextView
                 android:id="@+id/tv_data_export"
-                android:layout_width="match_parent"
+                android:layout_width="320dp"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:gravity="center"
                 android:layout_marginTop="20dp"
                 android:textSize="20dp"
                 android:textStyle="bold"
+                android:background="@color/quantum_grey300"
                 android:text="Übersicht aller Daten zum Export"/>
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_marginTop="50dp"
+                android:layout_marginTop="20dp"
+                android:background="@color/quantum_grey100"
                 android:orientation="horizontal">
 
                 <TextView
@@ -48,22 +51,38 @@
                     android:text="0"/>
             </LinearLayout>
 
-            <ListView
-                android:id="@+id/locations_data_export"
+            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="300dp"
-                android:layout_height="200dp"
-                android:layout_marginTop="40dp"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"
+                android:id="@+id/overview_stayTime_locs_export"
+                android:background="@color/quantum_grey100"
                 android:layout_gravity="center">
-            </ListView>
+            </TableLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="'Life' Apps:"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="20dp"/>
 
             <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
                 android:stretchColumns="1"
                 android:id="@+id/overview_screenTime_table_life"
+                android:background="@color/quantum_grey100"
                 android:layout_gravity="center"
                 android:layout_marginTop="10dp">
             </TableLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="'Work' Apps:"
+                android:layout_marginLeft="50dp"
+                android:layout_marginTop="20dp"/>
 
             <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="300dp"
@@ -71,6 +90,7 @@
                 android:stretchColumns="1"
                 android:id="@+id/overview_screenTime_table_work"
                 android:layout_gravity="center"
+                android:background="@color/quantum_grey100"
                 android:layout_marginTop="20dp">
             </TableLayout>
 

@@ -483,38 +483,11 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
                     Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
                 }
 
-                try {
-                    updateLocationListView(currentLocation,getActivity().getApplicationContext());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
                 getStayTime();
 
             }
         }, Looper.getMainLooper());
     }
-
-
-    //update listview on homescreen and data export --> dont add duplicates to list
-    public static void updateLocationListView(Location loc,Context context) throws IOException {
-        String checkLoc = getAddressFromLatLong(loc.getLatitude(), loc.getLongitude(), context);
-        if(!HomeScreen.addressesList.contains(checkLoc)) {
-            try {
-                HomeScreen.addressesList.add(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude(), context));
-                DataExport.addressesListWODupli.add(getAddressFromLatLong(loc.getLatitude(), loc.getLongitude(), context));
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        HomeScreen.listViewAdapter.notifyDataSetChanged();
-        HomeScreen.locationList.invalidateViews();
-        HomeScreen.locationList.refreshDrawableState();
-
-        DataExport.listViewAdapter2.notifyDataSetChanged();
-        DataExport.locationListOverview.refreshDrawableState();
-    }
-
-
 
 
     //init google map
