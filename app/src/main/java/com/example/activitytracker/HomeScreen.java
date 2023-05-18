@@ -3,16 +3,23 @@ package com.example.activitytracker;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.format.DateFormat;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 //import android.app.Fragment;
@@ -42,7 +49,6 @@ import java.util.Set;
 
 public class HomeScreen extends Fragment {
 
-    public static ListView locationList;
     public static ArrayList<String> addresses;
     public static ArrayList<String> addressesList;
     public static ArrayAdapter <String> listViewAdapter;
@@ -57,10 +63,11 @@ public class HomeScreen extends Fragment {
     private ArrayList<Integer>fr;
     private ArrayList<Integer>sa;
     private ArrayList<Integer>so;
+    public static TableLayout overViewLocTime;
 
-    ArrayList <String> latNotOlderThan24H;
-    ArrayList <String> longNotOlderThan24H;
-    ArrayList <String> timeStampNotOlderThan24H;
+    private ArrayList <String> latNotOlderThan24H;
+    private ArrayList <String> longNotOlderThan24H;
+    private ArrayList <String> timeStampNotOlderThan24H;
 
 
     public HomeScreen() {
@@ -70,9 +77,10 @@ public class HomeScreen extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.homescreen, container, false);
-        locationList = view.findViewById(R.id.location_list);
         stepBarChart = view.findViewById(R.id.step_chart);
         stepsDB = new steps_dbHelper(getActivity().getApplicationContext());
+        overViewLocTime = view.findViewById(R.id.overview_stayTime_locs);
+
 
         final Handler handler = new Handler();
         Runnable runnable = new Runnable() {
@@ -86,6 +94,7 @@ public class HomeScreen extends Fragment {
                         initDaysValues();
                         initStepBarChart(testBarData());
                     }
+                    initTableStayTimeLocs(getActivity().getApplicationContext());
                 }
                 catch (Exception e) {
                     Log.d("updateTV","not successful");
@@ -174,11 +183,28 @@ public class HomeScreen extends Fragment {
             }
         }
 
-        listViewAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), android.R.layout.simple_list_item_1,addressesList);
-
-
-        locationList.setAdapter(listViewAdapter);
     }
+
+    public static void initTableStayTimeLocs(Context c){
+        overViewLocTime.removeAllViews();
+
+        for(int i = 0; i < LocationTracking.mapStayTime.size(); i++){
+            TableRow tr = new TableRow(c);
+            TextView t1 = new TextView(c);
+            t1.setText(addressesList.get(i));
+            t1.setTextSize(15);
+            t1.setTypeface(null, Typeface.BOLD_ITALIC);
+            t1.setPadding(50,100,0,0);
+            tr.addView(t1);
+
+            TextView t2 = new TextView(c);
+            t2.setText("~ " + LocationTracking.mapStayTime.get(addressesList.get(i)) + " Min");
+            t2.setGravity(Gravity.RIGHT);
+            tr.addView(t2);
+            overViewLocTime.addView(tr);
+        }
+    }
+
 
 
 

@@ -156,7 +156,6 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         }
 
         viewLocationsInDB();
-        getStayTime();
 
         return view;
     }
@@ -259,7 +258,8 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     public static String getAddressFromLatLong(Double lat,Double lng,Context context) throws IOException {
         geocoder = new Geocoder(context, Locale.getDefault());
         addresses = geocoder.getFromLocation(lat, lng, 1);
-        String address = addresses.get(0).getAddressLine(0);
+        //String address = addresses.get(0).getAddressLine(0);
+        String address = addresses.get(0).getThoroughfare() + " " +  addresses.get(0).getFeatureName() + "\n"+ addresses.get(0).getPostalCode() + " "+ addresses.get(0).getLocality() + "\n"+ addresses.get(0).getCountryName();
         return address;
     }
 

@@ -34,11 +34,11 @@
                 android:textStyle="bold"/>
 
             <ImageView
-                android:layout_width="150dp"
-                android:layout_height="150dp"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
                 android:layout_gravity="center"
-                android:layout_marginLeft="10dp"
-                android:src="@drawable/logo_wo" />
+                android:layout_marginLeft="20dp"
+                android:src="@drawable/logo_head" />
 
 
         </LinearLayout>
@@ -46,8 +46,9 @@
 
             <TextView
                 android:id="@+id/tv_steps_overview"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
+                android:background="@color/quantum_grey300"
                 android:gravity="center"
                 android:layout_marginTop="20dp"
                 android:textSize="20dp"
@@ -63,21 +64,23 @@
 
             <TextView
                 android:id="@+id/tv_location_overview"
-                android:layout_width="match_parent"
+                android:layout_width="300dp"
                 android:layout_height="wrap_content"
+                android:background="@color/quantum_grey300"
                 android:gravity="center"
                 android:layout_marginTop="50dp"
                 android:textSize="20dp"
                 android:textStyle="bold"
                 android:text="Deine Standorte heute:"/>
 
-
-            <ListView
-                android:id="@+id/location_list"
+            <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="300dp"
-                android:layout_height="400dp"
-                android:layout_marginTop="20dp"
-                android:layout_centerHorizontal="true" />
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"
+                android:id="@+id/overview_stayTime_locs"
+                android:layout_gravity="center">
+            </TableLayout>
+
 
         </LinearLayout>
 
