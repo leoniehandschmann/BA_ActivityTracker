@@ -57,7 +57,6 @@ public class Evaluation extends Fragment{
         scroll_main = parent.findViewById(R.id.scroll_main);
         mainLL = scroll_main.findViewById(R.id.main_eval_layout);
         evaluation_db = new evaluation_dbHelper(getActivity().getApplicationContext());
-        locDataNotOlderThan24();
 
         //init location evaluations
         initLocations(inflater);
@@ -81,6 +80,7 @@ public class Evaluation extends Fragment{
             public void run() {
                 try{
                     mainLL.removeAllViews();
+                    locDataNotOlderThan24();
                     getLocationData();
                     if(locWODupli.size() != 0){
                         for (int i = 0; i < locWODupli.size(); i++) {
@@ -240,7 +240,6 @@ public class Evaluation extends Fragment{
 
 
         Cursor curs = db2.getData();
-        //Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp < date('now','-24 hours') ", null);
         if (curs.moveToFirst()){
             do {
 

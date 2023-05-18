@@ -38,7 +38,7 @@
                 android:layout_height="150dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
-                android:src="@drawable/logo" />
+                android:src="@drawable/logo_wo" />
 
 
         </LinearLayout>
@@ -70,6 +70,7 @@
                 android:textSize="20dp"
                 android:textStyle="bold"
                 android:text="Deine Standorte heute:"/>
+
 
             <ListView
                 android:id="@+id/location_list"

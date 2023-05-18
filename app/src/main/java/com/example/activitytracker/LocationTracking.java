@@ -82,9 +82,13 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TimeZone;
 import java.util.Timer;
 import java.util.concurrent.Executors;
@@ -110,6 +114,7 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
     public Button viewDB;
     public static Geocoder geocoder;
     public static List <Address> addresses;
+    public static Map<String, String> mapStayTime;
 
 
 
@@ -151,9 +156,58 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
         }
 
         viewLocationsInDB();
+        getStayTime();
 
         return view;
     }
+
+    private void getStayTime(){
+        int stayTime = 0;
+
+        Cursor c = location_db.getData();
+        ArrayList <String> locs = new ArrayList<String>();
+        ArrayList <String> addressesWOList = new ArrayList<String>();
+        mapStayTime = new HashMap<String, String>();
+
+
+        if(c.moveToFirst()){
+            do{
+                try {
+                    locs.add(getAddressFromLatLong(Double.parseDouble(c.getString(1)),Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } while (c.moveToNext());
+        }
+
+        Set<String> set = new HashSet<>();
+        for (String s : locs) {
+            if (set.add(s)) {
+                addressesWOList.add(s);
+            }
+        }
+
+        for(int i=0;i<addressesWOList.size();i++){
+            mapStayTime.put(addressesWOList.get(i),"0");
+        }
+
+        Set<String> set2 = new HashSet<>();
+        for (String s : locs) {
+            if (set2.add(s)) {
+                stayTime = 2;
+            }else{
+                stayTime = stayTime + 2;
+                for(int i=0;i<mapStayTime.size();i++){
+                    if(mapStayTime.get(s) != null){
+                        mapStayTime.put(s,String.valueOf(stayTime));
+                    }
+                }
+            }
+        }
+
+    }
+
+
 
 
     //init step sensor and counter
@@ -428,12 +482,13 @@ public class LocationTracking extends Fragment implements OnMapReadyCallback {
                 }else{
                     Toast.makeText(getActivity().getApplicationContext(), getString(R.string.db_no_success), Toast.LENGTH_SHORT).show();
                 }
+
                 try {
                     updateLocationListView(currentLocation,getActivity().getApplicationContext());
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
-
+                getStayTime();
 
             }
         }, Looper.getMainLooper());

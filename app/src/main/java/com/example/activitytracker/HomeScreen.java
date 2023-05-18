@@ -60,6 +60,7 @@ public class HomeScreen extends Fragment {
 
     ArrayList <String> latNotOlderThan24H;
     ArrayList <String> longNotOlderThan24H;
+    ArrayList <String> timeStampNotOlderThan24H;
 
 
     public HomeScreen() {
@@ -102,6 +103,7 @@ public class HomeScreen extends Fragment {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+
 
         return view;
     }
@@ -148,13 +150,15 @@ public class HomeScreen extends Fragment {
 
         if(latNotOlderThan24H!=null){
             for(int i =0;i<latNotOlderThan24H.size();i++){
-                addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(latNotOlderThan24H.get(i)),Double.parseDouble(longNotOlderThan24H.get(i)), getActivity().getApplicationContext()));
+                String ad = LocationTracking.getAddressFromLatLong(Double.parseDouble(latNotOlderThan24H.get(i)),Double.parseDouble(longNotOlderThan24H.get(i)), getActivity().getApplicationContext());
+                addresses.add(ad);
             }
         }else {
             if (c.moveToFirst()) {
                 do {
                     try {
-                        addresses.add(LocationTracking.getAddressFromLatLong(Double.parseDouble(c.getString(1)), Double.parseDouble(c.getString(2)), getActivity().getApplicationContext()));
+                        String ad = LocationTracking.getAddressFromLatLong(Double.parseDouble(latNotOlderThan24H.get(1)),Double.parseDouble(longNotOlderThan24H.get(2)), getActivity().getApplicationContext());
+                        addresses.add(ad);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -379,26 +383,21 @@ public class HomeScreen extends Fragment {
         location_dbHelper db2 = new location_dbHelper(getActivity().getApplicationContext());
         latNotOlderThan24H = new ArrayList<>();
         longNotOlderThan24H = new ArrayList<>();
+        timeStampNotOlderThan24H = new ArrayList<>();
 
         Cursor curs = db2.getData();
-        //Cursor curs = db2.getWritableDatabase().rawQuery("SELECT latitude,longitude FROM locations where timestamp < date('now','-24 hours') ", null);
         if (curs.moveToFirst()){
             do {
 
                 if(!(Long.parseLong(curs.getString(3)) <= System.currentTimeMillis() - 60*60*24*1000)){
-                    String column1 = curs.getString(1);
-                    String column2 = curs.getString(2);
-                    latNotOlderThan24H.add(column1);
-                    longNotOlderThan24H.add(column2);
+                    latNotOlderThan24H.add(curs.getString(1));
+                    longNotOlderThan24H.add(curs.getString(2));
+                    timeStampNotOlderThan24H.add(curs.getString(3));
                 }
-                // Passing values
-                // Do something Here with values
             } while(curs.moveToNext());
         }
         curs.close();
         db2.close();
-        Log.d("mcdonalds", String.valueOf(latNotOlderThan24H));
-        Log.d("mcdonalds", String.valueOf(longNotOlderThan24H));
     }
 
     private ArrayList<BarEntry> testBarData(){
