@@ -5,4 +5,8 @@
         android:icon="@drawable/info"
         app:showAsAction="ifRoom"
         android:title="Info" />
+    <item android:id="@+id/notification_icon"
+        android:icon="@drawable/notification"
+        app:showAsAction="ifRoom"
+        android:title="Edit Notification" />
 </menu>

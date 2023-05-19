@@ -122,9 +122,9 @@ public class DataExport extends Fragment{
         for(int i=0; i <ScreenTimeTracking.selectedPackages_Life.size();i++){
             Boolean checkInsert = screenTime_db.insertData("life",ScreenTimeTracking.selectedPackages_Life.get(i),ScreenTimeTracking.getAppUsage(getActivity().getApplicationContext(),ScreenTimeTracking.selectedPackages_Life.get(i)));
             if(checkInsert==true){
-                Toast.makeText(getActivity().getApplicationContext(), "new ScreenTime life inserted in DB", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), R.string.screentime_db_success, Toast.LENGTH_SHORT).show();
             }else{
-                Toast.makeText(getActivity().getApplicationContext(), "nothing inserted in DB", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getActivity().getApplicationContext(), R.string.db_no_success, Toast.LENGTH_SHORT).show();
             }
         }
 

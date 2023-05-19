@@ -6,15 +6,20 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Observer;
 
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.TimePickerDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -24,12 +29,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.TimePicker;
 import android.widget.Toast;
 import android.widget.Toolbar;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.nio.Buffer;
+import java.text.DateFormat;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
@@ -44,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     Fragment active = fragment1;
     private StringBuffer infoBuffer;
     private AlertDialog.Builder builder;
+    private int selectedMinuteNotifi;
+    public MutableLiveData<Integer> selectedHourNotifi = new MutableLiveData<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +81,13 @@ public class MainActivity extends AppCompatActivity {
         builder = new AlertDialog.Builder(this);
 
 
+
+        selectedHourNotifi.observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                initReminderNotification();
+            }
+        });
 
     }
 
@@ -110,7 +127,22 @@ public class MainActivity extends AppCompatActivity {
                 infoBuffer.append(getString(R.string.info_export));
                 makeInfoText(infoBuffer);
             }
-            return true;
+        }
+        if(id == R.id.notification_icon){
+            final Calendar c = Calendar.getInstance();
+            int hour = c.get(Calendar.HOUR_OF_DAY);
+            int minute = c.get(Calendar.MINUTE);
+            TimePickerDialog.OnTimeSetListener onTimeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                @Override
+                public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                    selectedHourNotifi.setValue(hourOfDay);
+                    selectedMinuteNotifi = minute;
+                }
+            };
+            TimePickerDialog timePicker = new TimePickerDialog(this,onTimeSetListener,hour,minute,true);
+            timePicker.setTitle("Wann soll Ativo dich erinnern?");
+            timePicker.show();
+
         }
         return super.onOptionsItemSelected(item);
     }
@@ -129,9 +161,15 @@ public class MainActivity extends AppCompatActivity {
 
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.HOUR_OF_DAY,20);
-        cal.set(Calendar.MINUTE, 0);
+        if(selectedHourNotifi.getValue() != null){
+            cal.set(Calendar.HOUR_OF_DAY,selectedHourNotifi.getValue());
+            cal.set(Calendar.MINUTE,selectedMinuteNotifi);
+        }else {
+            cal.set(Calendar.HOUR_OF_DAY, 20);
+            cal.set(Calendar.MINUTE, 00);
+        }
         cal.set(Calendar.SECOND, 0);
+
 
         alarmManager.set(AlarmManager.RTC_WAKEUP,cal.getTimeInMillis(),pendingIntent);
 
